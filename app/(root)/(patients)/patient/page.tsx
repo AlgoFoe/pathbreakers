@@ -1,54 +1,9 @@
 "use client";
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect } from "react";
-import { useUser } from "@clerk/nextjs";
-import useGlobalStore from "@/zustand/useProps";
 
 const PatientHome = () => {
-  const { user, isLoaded, isSignedIn } = useUser();
-  const { setPatientId, setUserId, role, setRole } = useGlobalStore();
 
-  useEffect(() => {
-    if (isLoaded && isSignedIn && user) {
-      const userRole = user.publicMetadata.role as string | undefined;
-      const userId = user.publicMetadata.userId as string | undefined;
-
-      if (userRole) {
-        setRole(userRole);
-        localStorage.setItem("role", userRole);
-      } else {
-        setRole("patient");
-        localStorage.setItem("role", "patient");
-      }
-      if (userId) {
-        setUserId(userId);
-        localStorage.setItem("userId", userId);
-      }
-
-      if (userId && role === "patient") {
-        const storedPatientId = localStorage.getItem("patientId");
-
-        if (storedPatientId) {
-          setPatientId(storedPatientId);
-        } else {
-          const fetchPatientId = async () => {
-            try {
-              const response = await fetch(`/api/patients/user/${userId}`);
-              if (!response.ok) throw new Error("Patient not found");
-
-              const data = await response.json();
-              setPatientId(data._id);
-              localStorage.setItem("patientId", data._id);
-            } catch (error) {
-              console.error("Error fetching patient:", error);
-            }
-          };
-          fetchPatientId();
-        }
-      }
-    }
-  }, [isLoaded, isSignedIn, user, setRole, setUserId, setPatientId, role]);
   return (
     <div className="w-full min-h-screen border flex justify-center flex-wrap p-2">
       <div className="w-3/4 h-fit grid grid-cols-1 sm:grid-cols-2 mt-10 gap-3 p-2">
