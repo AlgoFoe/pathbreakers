@@ -13,7 +13,6 @@ interface CreateUserParam {
   firstName: string|null;
   lastName: string;
   photo: string;
-  role:string;
 }
 // CREATE
 export async function createUser(user: CreateUserParam) {

@@ -21,13 +21,14 @@ export const connectToDatabase = async () => {
 
   console.log('connected to MongoDB')
   if (!MONGODB_URL) throw new Error('Missing MONGODB_URL')
-
-  cached.promise =
-    cached.promise ||
-    mongoose.connect(MONGODB_URL, {
+  if (!cached.promise) {
+    // Strict query mode to ensure proper type handling
+    mongoose.set('strictQuery', true);
+    cached.promise = mongoose.connect(MONGODB_URL, {
       dbName: 'pathbreakers',
-      bufferCommands: false,
-    })
+      bufferCommands: false
+    });
+  }
 
   cached.conn = await cached.promise
   return cached.conn

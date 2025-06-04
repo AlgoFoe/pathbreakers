@@ -1,0 +1,98 @@
+/* Custom styles for React Quill editor */
+
+/* Fix editor height and border issues */
+.quill-container .quill {
+  display: flex;
+  flex-direction: column;
+  height: 400px;
+}
+
+.quill-container .ql-container {
+  flex: 1;
+  overflow-y: auto;
+  font-size: 16px;
+  font-family: inherit;
+}
+
+/* Style the toolbar */
+.quill-container .ql-toolbar {
+  background-color: #f9fafb;
+  border-bottom: 1px solid #e5e7eb;
+  padding: 8px;
+  border-top-left-radius: 6px;
+  border-top-right-radius: 6px;
+}
+
+/* Style the editor area */
+.quill-container .ql-editor {
+  min-height: 300px;
+  padding: 16px;
+  line-height: 1.6;
+}
+
+/* Style headings */
+.quill-container .ql-editor h1 {
+  font-size: 2em;
+  margin-bottom: 0.75em;
+}
+
+.quill-container .ql-editor h2 {
+  font-size: 1.5em;
+  margin-bottom: 0.75em;
+}
+
+.quill-container .ql-editor h3 {
+  font-size: 1.25em;
+  margin-bottom: 0.75em;
+}
+
+/* Style links */
+.quill-container .ql-editor a {
+  color: #2563eb;
+  text-decoration: underline;
+}
+
+/* Style lists */
+.quill-container .ql-editor ul,
+.quill-container .ql-editor ol {
+  padding-left: 1.5em;
+}
+
+/* Style code blocks */
+.quill-container .ql-editor pre.ql-syntax {
+  background-color: #f3f4f6;
+  color: #1f2937;
+  border-radius: 4px;
+  padding: 1em;
+  margin-bottom: 1em;
+  font-family: monospace;
+}
+
+/* Style blockquotes */
+.quill-container .ql-editor blockquote {
+  border-left: 4px solid #e5e7eb;
+  padding-left: 16px;
+  margin: 16px 0;
+  font-style: italic;
+  color: #4b5563;
+}
+
+/* Style toolbar buttons */
+.quill-container .ql-picker {
+  color: #1f2937;
+}
+
+.quill-container .ql-formats button {
+  color: #1f2937;
+}
+
+.quill-container .ql-formats button:hover,
+.quill-container .ql-formats .ql-active {
+  color: #2563eb;
+}
+
+/* Quill placeholder text */
+.quill-container .ql-editor.ql-blank::before {
+  color: #9ca3af;
+  font-style: italic;
+}

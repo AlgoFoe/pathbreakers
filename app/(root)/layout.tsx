@@ -1,7 +1,6 @@
 import MobileNav from "@/components/shared/MobileNav";
 import Sidebar from "@/components/shared/Sidebar";
 import { Toaster } from "@/components/ui/toaster";
-import Script from "next/script";
 
 const Layout = ({ children }: { children: React.ReactNode }) => {
   return (
@@ -17,15 +16,6 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
       </div>
 
       <Toaster />
-      
-      <Script
-        src="https://cdn.botpress.cloud/webchat/v2.2/inject.js"
-        strategy="afterInteractive"
-      />
-      <Script
-        src="https://files.bpcontent.cloud/2025/01/15/05/20250115052520-FML6FQ6L.js"
-        strategy="afterInteractive"
-      />
     </main>
   );
 };

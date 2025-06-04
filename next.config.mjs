@@ -35,6 +35,12 @@ const nextConfig = {
             {
                 hostname: 'c8.alamy.com',
             },
+            {
+                hostname:'images.unsplash.com',
+            },
+            {
+                hostname: 'litfind.bookscape.com',
+            }
         ]
     }
 };

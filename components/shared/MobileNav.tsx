@@ -1,117 +1,190 @@
 "use client";
 
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { navLinks } from "@/constants";
+import { dashboardNavLinks, homeNavLinks } from "@/constants";
 import { SignedIn, SignedOut, UserButton } from "@clerk/nextjs";
 import { DialogTitle } from "@radix-ui/react-dialog";
 import {
-  Bed,
-  BriefcaseMedical,
-  CalendarPlus2,
-  House,
-  HousePlus,
+  BookOpen,
+  ChevronDown,
+  GraduationCap,
+  HomeIcon as House,
+  Info,
+  LayoutDashboard,
+  LibraryBig,
+  Mail,
   Menu,
-  MessageSquareMore,
-  MessageSquarePlus,
   Newspaper,
-  Pill,
-  PlusIcon,
-  Star,
-  Stethoscope,
-  UserRound,
+  NotebookPen,
+  Users,
+  Zap
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { Button } from "../ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+
 const iconMap = {
   "/FaHome": <House />,
-  "/FaStar": <Star />,
-  "/FaBriefcaseMedical": <BriefcaseMedical />,
-  "/FaUser": <UserRound />,
-  "/FaStethoscope": <Stethoscope />,
-  "/FaChat": <MessageSquareMore />,
-  "/FaCalendarPlus2": <CalendarPlus2/>,
-  "/FaHousePlus": <HousePlus/>,
-  "/FaPlus":<PlusIcon/>,
-  "/FaPill":<Pill/>,
-  "/FaNewspaper":<Newspaper/>,
-    "/FaMessage": <MessageSquarePlus />,
-    "/FaBed": <Bed />,
+  "/LayoutDashboard": <LayoutDashboard />,
+  "/LibraryBig": <LibraryBig />,
+  "/NotebookPen": <NotebookPen />,
+  "/GraduationCap": <GraduationCap />,
+  "/Zap": <Zap />,
+  "/Info": <Info />,
+  "/BookOpen": <BookOpen />,
+  "/Mail": <Mail />,
+  "/Newspaper": <Newspaper/>, 
+  "/Users": <Users />
 };
 
 const MobileNav = () => {
   const pathname = usePathname();
-  const baseRoute = "/" + pathname.split("/").slice(1, 4).join("/");
-  const NavLinks = navLinks
-  const [isSheetOpen, setSheetOpen] = useState(false);
+  let baseRoute = pathname.split("/").slice(1, 2).join("/");
+  if (baseRoute === "") {
+    baseRoute = "Home";
+  }
   
+  const NavLinks = baseRoute === "dashboard" ? dashboardNavLinks : homeNavLinks;
+  let title = "";
+  
+  const dashBoardFeature = pathname.split("/")[2];
+  const homeFeature = pathname.split("/")[1];
+  if (dashBoardFeature === "study-materials") {
+    title = "Study Materials";
+  } else if (dashBoardFeature === "quiz") {
+    title = "Quiz Dashboard";
+  } else if (dashBoardFeature === "flashcards") {
+    title = "Flash Cards";
+  } else if (dashBoardFeature === "blogs") {
+    title = "Blogs";
+  } else if (homeFeature === "mentors" || homeFeature === "cuet-syllabus") {
+    title = "Home";
+  } else {
+    title = "Dashboard";
+  }
+  const [isSheetOpen, setSheetOpen] = useState(false);
+
   return (
-    <header className="header flex items-center z-10 ">
-      <Link href="/" className="flex items-center gap-2">
+    <header className="header flex items-center z-10">
+      <Link href="/" className="flex">
         <Image
-          src="/assets/images/logo-large2.png"
+          src="/assets/images/large-logored.png"
           alt="logo"
-          width={60}
-          height={51}
+          width={120}
+          height={100}
+          className="-translate-x-6"
         />
       </Link>
-      <div className="text-2xl sm:text-3xl lg:text-4xl font-bold text-blue ml-0 sm:ml-2 leading-5 sm:leading-6">
-        {baseRoute}
+      <div className="text-3xl sm:text-3xl lg:text-4xl font-bold text-black ml-0 sm:ml-2 leading-5 sm:leading-6 -translate-x-6 whitespace-nowrap">
+        {title}
       </div>
-      <nav className="flex items-center gap-2 ">
+      <nav className="flex items-center gap-2">
         <SignedIn>
           <UserButton afterSignOutUrl="/" />
-          <Sheet  open={isSheetOpen} onOpenChange={()=>setSheetOpen(!isSheetOpen)}>
+          <Sheet open={isSheetOpen} onOpenChange={() => setSheetOpen(!isSheetOpen)}>
             <SheetTrigger asChild>
               <Button title="Menu" className="p-0">
-              <Menu />
+                <Menu />
               </Button>
             </SheetTrigger>
-            <SheetContent side="right" className="sheet-content sm:w-64 p-4 flex flex-col justify-between">
+            <SheetContent
+              side="right"
+              className="sheet-content bg-white sm:w-64 p-4 flex flex-col justify-between [&>button]:text-black [&>button]:ring-2"
+            >
               <div>
                 <DialogTitle></DialogTitle>
                 <div className="flex flex-col gap-4">
                   <Image
-                    src="/assets/images/logov.png"
+                    src="/assets/images/logo-red.png"
                     alt="logo"
                     width={152}
                     height={23}
-                  />
-                  <ul className="flex flex-col gap-2 overflow-auto ">
-                    {NavLinks
-                      .filter(link => link.label !== "Profile")
-                      .map((link) => {
-                        const isActive = link.route === baseRoute;
+                    className="translate-x-1/3"
+                  />                  <ul className="flex flex-col gap-2 overflow-auto">
+                    {NavLinks.map((link) => {
+                     const isActive =
+                  link.route === pathname ||
+                  (link.label === "Quiz" && pathname.startsWith("/dashboard/quiz"));
+                      
+                      if (link.label === "CUET Syllabus") {
                         return (
-                          <li key={link.route} className={`bg-gray-100 ${isActive && 'bg-gray-300'} rounded-lg p-1`}>
-                            <Link
-                              href={link.route}
-                              className={`flex items-center gap-2 p-2 text-lg font-bold ${
-                                isActive ? "text-black" : "text-gray-700"
-                              }`}
-                              onClick={()=>setSheetOpen(!isSheetOpen)}
-                            >
-                              <span>
-                                {iconMap[link.icon]}
-                              </span>
-                              <span>{link.label}</span>
-                            </Link>
+                          <li
+                            key={link.route}
+                            className={`bg-gray-100 ${
+                              pathname.startsWith("/cuet-syllabus") && "bg-gray-700"
+                            }  bg-gray-200 transition-colors duration-200 text-black rounded-lg p-1`}
+                          >
+                            <DropdownMenu>
+                              <DropdownMenuTrigger className="w-full">
+                                <div 
+                                  className={`flex items-center justify-between w-full gap-2 p-2 text-lg font-bold hover:text-gray-700 ${
+                                    pathname.startsWith("/cuet-syllabus") ? "text-white" : "text-gray-700"
+                                  }`}
+                                >
+                                  <div className="flex items-center gap-2">
+                                    <span>{iconMap[link.icon]}</span>
+                                    <span>{link.label}</span>
+                                  </div>
+                                  <ChevronDown className="h-4 w-4" />
+                                </div>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end" className="w-full">
+                                <DropdownMenuItem 
+                                  className="text-gray-400 cursor-not-allowed"
+                                  disabled
+                                >
+                                  Science
+                                </DropdownMenuItem>
+                                <DropdownMenuItem 
+                                  onClick={() => {
+                                    setSheetOpen(false);
+                                    window.location.href = "/cuet-syllabus/commerce";
+                                  }}
+                                >
+                                  Commerce
+                                </DropdownMenuItem>
+                                <DropdownMenuItem 
+                                  className="text-gray-400 cursor-not-allowed"
+                                  disabled
+                                >
+                                  Arts
+                                </DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
                           </li>
                         );
-                      })}
+                      }
+                      
+                      return (
+                        <li
+                          key={link.route}
+                          className={`bg-gray-100 ${
+                            isActive && "bg-gray-700"
+                          }  bg-gray-200 transition-colors duration-200 text-black rounded-lg p-1`}
+                        >
+                          <Link
+                            href={link.route}
+                            className={`flex items-center gap-2 p-2 text-lg font-bold hover:text-gray-700 ${
+                              isActive ? "text-white" : "text-gray-700"
+                            }`}
+                            onClick={() => setSheetOpen(!isSheetOpen)}
+                          >
+                            <span>{iconMap[link.icon]}</span>
+                            <span>{link.label}</span>
+                          </Link>
+                        </li>
+                      );
+                    })}
                   </ul>
                 </div>
-              </div>
-              <div className="bg-gray-400 rounded-lg p-1 mt-4">
-                <Link
-                  href="/profile"
-                  className="flex items-center gap-2 p-2 text-lg font-bold text-dark-700"
-                >
-                  <span>{iconMap["/FaUser"]}</span>
-                  <span>Profile</span>
-                </Link>
               </div>
             </SheetContent>
           </Sheet>

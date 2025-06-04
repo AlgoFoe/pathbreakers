@@ -11,7 +11,7 @@ const SignInPage = () => {
       <div className="sm:flex hidden flex-1 bg-white text-black flex-col justify-center px-8 lg:px-16 py-12 relative">
         <div className="max-w-lg mx-auto">
           <Image
-            src="/assets/images/large-logo.png"
+            src="/assets/images/large-logored.png"
             alt="PathBreakers Logo"
             width={300}
             height={300}

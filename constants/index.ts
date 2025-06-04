@@ -1,45 +1,87 @@
-export type IconName = "/FaHome" | "/FaStar" | "/FaBriefcaseMedical" | "/FaUser" |"/FaStethoscope" | "/FaChat" | "/FaCalendarPlus2" | "/FaHousePlus" | "/FaPlus" | "/FaPill" | "/FaNewspaper"|"/FaMessage" |"/FaBed";
+export type IconName =
+  | "/FaHome"
+  | "/LibraryBig"
+  | "/NotebookPen"
+  | "/GraduationCap"
+  | "/Zap"
+  | "/LayoutDashboard"
+  | "/Info"
+  | "/BookOpen"
+  | "/Mail"
+  | "/Newspaper"
+  | "/Users";
 
-export const navLinks :{label: string; route: string; icon: IconName }[] = [
+export const homeNavLinks: { label: string; route: string; icon: IconName }[] = [
   {
-    label: 'Home',
-    route: '/home',
-    icon: '/FaHome',
+    label: "Dashboard",
+    route: "/dashboard",
+    icon: "/LayoutDashboard",
   },
   {
-    label: 'Health Calendar',
-    route: '/health-calendar',
-    icon: '/FaCalendarPlus2',
-  },  
-  {
-    label: 'Care Finder',
-    route: '/care-finder',
-    icon: '/FaHousePlus',
+    label: "About Us",
+    route: "/about",
+    icon: "/Info",
   },
   {
-    label: 'Hospital Capacity',
-    route: '/ICUbeds',
-    icon: '/FaBed',
+    label: "Courses",
+    route: "/courses",
+    icon: "/GraduationCap",
   },
   {
-    label: 'Community updates',
-    route: '/Community-update',
-    icon: '/FaMessage',
+    label: "Mentorship",
+    route: "/mentors",
+    icon: "/Users",
   },
   {
-    label: 'Health Connect',
-    route: '/health-connect',
-    icon: '/FaStethoscope',
+    label: "CUET Syllabus",
+    route: "/cuet-syllabus",
+    icon: "/BookOpen",
   },
   {
-    label: 'MedInfo',
-    route: '/medinfo',
-    icon: '/FaPill',
+    label: "Contact Us",
+    route: "/contact",
+    icon: "/Mail",
+  },
+];
+
+export const dashboardNavLinks: {
+  label: string;
+  route: string;
+  icon: IconName;
+}[] = [
+  {
+    label: "Home",
+    route: "/",
+    icon: "/FaHome",
   },
   {
-    label: 'Inventory',
-    route: '/resources',
-    icon: '/FaPlus',
+    label: "Dashboard",
+    route: "/dashboard",  
+    icon: "/LayoutDashboard",
   },
-  
+  {
+    label: "Study Materials",
+    route: "/dashboard/study-materials",
+    icon: "/LibraryBig",
+  },
+  {
+    label: "Quiz",
+    route: "/dashboard/quiz",
+    icon: "/NotebookPen",
+  },
+  {
+    label: "Flash Cards",
+    route: "/dashboard/flashcards",
+    icon: "/Zap",
+  },
+  {
+    label: "Question Banks",
+    route: "/dashboard/question-banks",
+    icon: "/BookOpen",
+  },
+  {
+    label: "Blogs",
+    route: "/dashboard/blogs",
+    icon: "/Newspaper",
+  }
 ];
