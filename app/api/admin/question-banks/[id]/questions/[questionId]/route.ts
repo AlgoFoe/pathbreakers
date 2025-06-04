@@ -33,7 +33,7 @@ export async function GET(req: NextRequest, { params }: Params) {
       });
     }
     
-    const question = questionBank.questions.find(q => q.id === questionId);
+    const question = questionBank.questions.find((q: { id: string }) => q.id === questionId);
     
     if (!question) {
       return new NextResponse(JSON.stringify({ error: 'Question not found' }), { 
@@ -78,7 +78,7 @@ export async function PUT(req: NextRequest, { params }: Params) {
     }
     
     // Find the question index
-    const questionIndex = questionBank.questions.findIndex(q => q.id === questionId);
+    const questionIndex: number = questionBank.questions.findIndex((q: { id: string }) => q.id === questionId);
     
     if (questionIndex === -1) {
       return new NextResponse(JSON.stringify({ error: 'Question not found' }), { 
@@ -131,7 +131,7 @@ export async function DELETE(req: NextRequest, { params }: Params) {
     }
     
     // Find the question index
-    const questionIndex = questionBank.questions.findIndex(q => q.id === questionId);
+    const questionIndex: number = questionBank.questions.findIndex((q: { id: string }) => q.id === questionId);
     
     if (questionIndex === -1) {
       return new NextResponse(JSON.stringify({ error: 'Question not found' }), { 

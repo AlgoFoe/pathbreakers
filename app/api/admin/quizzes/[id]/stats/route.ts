@@ -72,7 +72,21 @@ export async function GET(
 
     // Calculate per-question statistics
     const questionStats = quiz.questions.map((question: any) => {
-      const questionAttempts = attempts.flatMap(attempt => 
+      interface QuestionAttempt {
+        questionId: string;
+        selectedOption?: string;
+        isCorrect?: boolean;
+      }
+      
+      // Define the structure for attempts related to questions
+      interface QuizAttemptModel {
+        questionAttempts: QuestionAttempt[];
+        score?: number;
+        isCompleted: boolean;
+        totalMarks?: number;
+      }
+
+      const questionAttempts: QuestionAttempt[] = attempts.flatMap((attempt: QuizAttemptModel) => 
         attempt.questionAttempts.filter(q => q.questionId === question.id)
       );
       

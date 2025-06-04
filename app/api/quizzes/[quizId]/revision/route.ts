@@ -35,25 +35,55 @@ export async function GET(
     }
     
     // Format data for revision
-    const revisionData = {
+    interface Question {
+      id: string;
+      question: string;
+      options: string[];
+      correctAnswer: string;
+    }
+    
+    interface QuestionAttempt {
+      questionId: string;
+      selectedOption: string | null;
+      isCorrect: boolean;
+    }
+    
+    interface RevisionQuestion {
+      id: string;
+      question: string;
+      options: string[];
+      correctAnswer: string;
+      selectedAnswer: string | null;
+      isCorrect: boolean;
+    }
+    
+    interface RevisionData {
+      id: string;
+      title: string;
+      date: Date;
+      duration: number;
+      questions: RevisionQuestion[];
+    }
+    
+    const revisionData: RevisionData = {
       id: quiz.id,
       title: quiz.title,
       date: quiz.date,
       duration: quiz.duration,
-      questions: quiz.questions.map(question => {
-        // Find the user's attempt for this question if it exists
-        const attempt = quizAttempt?.questionAttempts.find(
-          a => a.questionId === question.id
-        );
-        
-        return {
-          id: question.id,
-          question: question.question,
-          options: question.options,
-          correctAnswer: question.correctAnswer,
-          selectedAnswer: attempt?.selectedOption || null,
-          isCorrect: attempt?.isCorrect || false
-        };
+      questions: quiz.questions.map((question: Question) => {
+      // Find the user's attempt for this question if it exists
+      const attempt: QuestionAttempt | undefined = quizAttempt?.questionAttempts.find(
+        (a: QuestionAttempt) => a.questionId === question.id
+      );
+      
+      return {
+        id: question.id,
+        question: question.question,
+        options: question.options,
+        correctAnswer: question.correctAnswer,
+        selectedAnswer: attempt?.selectedOption || null,
+        isCorrect: attempt?.isCorrect || false
+      };
       })
     };
     

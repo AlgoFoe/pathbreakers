@@ -44,7 +44,18 @@ export async function POST(
     
     // Create a map of correct answers for validation
     const correctAnswersMap: { [key: number]: string } = {};
-    quiz.questions.forEach((q) => {
+    // Define interfaces
+    interface Question {
+      id: number;
+      correctAnswer: string;
+    }
+
+    interface QuizType {
+      questions: Question[];
+    }
+
+    // Use the interfaces in the code
+    (quiz as QuizType).questions.forEach((q) => {
       correctAnswersMap[q.id] = q.correctAnswer;
     });      // Get existing quiz attempt or create new one
     let quizAttempt = await QuizAttempt.findOne({
