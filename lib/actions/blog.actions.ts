@@ -1,6 +1,16 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { headers } from "next/headers";
+
+// Helper function to get the base URL for API calls
+function getBaseUrl() {
+  // Get the host from the request headers
+  const headersList = headers();
+  const host = headersList.get('host') || 'localhost:3000';
+  const protocol = host.includes('localhost') ? 'http' : 'https';
+  return `${protocol}://${host}`;
+}
 
 export interface BlogData {
   id?: string;
@@ -26,10 +36,11 @@ export async function getBlogs(params?: {
     if (params?.tag) queryParams.append("tag", params.tag);
     if (params?.limit) queryParams.append("limit", params.limit.toString());
     if (params?.page) queryParams.append("page", params.page.toString());
+      const queryString = queryParams.toString();
     
-    const queryString = queryParams.toString();
-    // Simplify URL construction like the quiz API
-    const url = `/api/blogs${queryString ? `?${queryString}` : ''}`;
+    // Get the base URL for API calls
+    const baseUrl = getBaseUrl();
+    const url = `${baseUrl}/api/blogs${queryString ? `?${queryString}` : ''}`;
     console.log("Fetching blogs from:", url);
     
     const response = await fetch(
@@ -50,9 +61,9 @@ export async function getBlogs(params?: {
 }
 
 export async function getBlogByIdOrSlug(idOrSlug: string) {
-  try {
-    // Simplify URL construction like the quiz API
-    const url = `/api/blogs/${idOrSlug}`;
+  try {    // Get the base URL for API calls
+    const baseUrl = getBaseUrl();
+    const url = `${baseUrl}/api/blogs/${idOrSlug}`;
     
     const response = await fetch(
       url,
@@ -72,9 +83,9 @@ export async function getBlogByIdOrSlug(idOrSlug: string) {
 }
 
 export async function createBlog(data: BlogData) {
-  try {
-    // Simplify URL construction like the quiz API
-    const url = '/api/blogs';
+  try {    // Get the base URL for API calls
+    const baseUrl = getBaseUrl();
+    const url = `${baseUrl}/api/blogs`;
     
     const response = await fetch(
       url,
@@ -101,8 +112,9 @@ export async function createBlog(data: BlogData) {
 
 export async function updateBlog(id: string, data: BlogData) {
   try {
-    // Simplify URL construction like the quiz API
-    const url = `/api/blogs/${id}`;
+    // Get the base URL for API calls
+    const baseUrl = getBaseUrl();
+    const url = `${baseUrl}/api/blogs/${id}`;
     
     const response = await fetch(
       url,
@@ -131,8 +143,9 @@ export async function updateBlog(id: string, data: BlogData) {
 
 export async function deleteBlog(id: string) {
   try {
-    // Simplify URL construction like the quiz API
-    const url = `/api/blogs/${id}`;
+    // Get the base URL for API calls
+    const baseUrl = getBaseUrl();
+    const url = `${baseUrl}/api/blogs/${id}`;
     
     const response = await fetch(
       url,

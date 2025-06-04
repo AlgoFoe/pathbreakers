@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { headers } from "next/headers";
 
 export interface FlashcardData {
   id?: string;
@@ -8,6 +9,15 @@ export interface FlashcardData {
   answer: string;
   category: string;
   difficulty: string;
+}
+
+// Helper function to get the base URL for API calls
+function getBaseUrl() {
+  // Get the host from the request headers
+  const headersList = headers();
+  const host = headersList.get('host') || 'localhost:3000';
+  const protocol = host.includes('localhost') ? 'http' : 'https';
+  return `${protocol}://${host}`;
 }
 
 export async function getFlashcards(params?: {
@@ -21,10 +31,11 @@ export async function getFlashcards(params?: {
     if (params?.difficulty) queryParams.append("difficulty", params.difficulty);
     if (params?.query) queryParams.append("query", params.query);
     
-    const queryString = queryParams.toString();
+    const queryString = queryParams.toString();    // Get the base URL for API calls
+    const baseUrl = getBaseUrl();
+    const url = `${baseUrl}/api/flashcards${queryString ? `?${queryString}` : ''}`;
     
-    // Simplify URL construction like the quiz API
-    const url = `/api/flashcards${queryString ? `?${queryString}` : ''}`;
+    console.log("Fetching flashcards from:", url);
     
     // Make API call
     const response = await fetch(
@@ -44,9 +55,11 @@ export async function getFlashcards(params?: {
   }
 }
 
-export async function createFlashcard(data: FlashcardData) {  try {
-    // Simplify URL construction like the quiz API
-    const url = '/api/flashcards';
+export async function createFlashcard(data: FlashcardData) {  try {    // Get the base URL for API calls
+    const baseUrl = getBaseUrl();
+    const url = `${baseUrl}/api/flashcards`;
+    
+    console.log("Creating flashcard at:", url);
     
     const response = await fetch(
       url,
@@ -71,9 +84,11 @@ export async function createFlashcard(data: FlashcardData) {  try {
   }
 }
 
-export async function updateFlashcard(id: string, data: FlashcardData) {  try {
-    // Simplify URL construction like the quiz API
-    const url = `/api/flashcards/${id}`;
+export async function updateFlashcard(id: string, data: FlashcardData) {  try {    // Get the base URL for API calls
+    const baseUrl = getBaseUrl();
+    const url = `${baseUrl}/api/flashcards/${id}`;
+    
+    console.log("Updating flashcard at:", url);
     
     const response = await fetch(
       url,
@@ -98,9 +113,12 @@ export async function updateFlashcard(id: string, data: FlashcardData) {  try {
   }
 }
 
-export async function deleteFlashcard(id: string) {  try {
-    // Simplify URL construction like the quiz API
-    const url = `/api/flashcards/${id}`;
+export async function deleteFlashcard(id: string) {
+  try {    // Get the base URL for API calls
+    const baseUrl = getBaseUrl();
+    const url = `${baseUrl}/api/flashcards/${id}`;
+    
+    console.log("Deleting flashcard at:", url);
     
     const response = await fetch(
       url,
