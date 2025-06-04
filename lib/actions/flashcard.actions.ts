@@ -14,8 +14,7 @@ export async function getFlashcards(params?: {
   category?: string;
   difficulty?: string;
   query?: string;
-}) {
-  try {
+}) {  try {
     // Build query string from params
     const queryParams = new URLSearchParams();
     if (params?.category) queryParams.append("category", params.category);
@@ -24,9 +23,12 @@ export async function getFlashcards(params?: {
     
     const queryString = queryParams.toString();
     
+    // Simplify URL construction like the quiz API
+    const url = `/api/flashcards${queryString ? `?${queryString}` : ''}`;
+    
     // Make API call
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL || process.env.VERCEL_URL || 'http://localhost:3000'}/api/flashcards${queryString ? `?${queryString}` : ''}`,
+      url,
       { cache: 'no-store' } // Disable caching
     );
     
@@ -42,10 +44,12 @@ export async function getFlashcards(params?: {
   }
 }
 
-export async function createFlashcard(data: FlashcardData) {
-  try {
+export async function createFlashcard(data: FlashcardData) {  try {
+    // Simplify URL construction like the quiz API
+    const url = '/api/flashcards';
+    
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL || process.env.VERCEL_URL || 'http://localhost:3000'}/api/flashcards`,
+      url,
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -67,10 +71,12 @@ export async function createFlashcard(data: FlashcardData) {
   }
 }
 
-export async function updateFlashcard(id: string, data: FlashcardData) {
-  try {
+export async function updateFlashcard(id: string, data: FlashcardData) {  try {
+    // Simplify URL construction like the quiz API
+    const url = `/api/flashcards/${id}`;
+    
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL || process.env.VERCEL_URL || 'http://localhost:3000'}/api/flashcards/${id}`,
+      url,
       {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
@@ -92,10 +98,12 @@ export async function updateFlashcard(id: string, data: FlashcardData) {
   }
 }
 
-export async function deleteFlashcard(id: string) {
-  try {
+export async function deleteFlashcard(id: string) {  try {
+    // Simplify URL construction like the quiz API
+    const url = `/api/flashcards/${id}`;
+    
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL || process.env.VERCEL_URL || 'http://localhost:3000'}/api/flashcards/${id}`,
+      url,
       { method: 'DELETE' }
     );
     

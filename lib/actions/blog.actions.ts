@@ -18,8 +18,7 @@ export async function getBlogs(params?: {
   tag?: string;
   limit?: number;
   page?: number;
-}) {
-  try {
+}) {  try {
     // Build query string from params
     const queryParams = new URLSearchParams();
     
@@ -29,10 +28,8 @@ export async function getBlogs(params?: {
     if (params?.page) queryParams.append("page", params.page.toString());
     
     const queryString = queryParams.toString();
-      // Make API call
-    const baseUrl = process.env.NEXT_PUBLIC_API_URL || 
-                   (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000');
-    const url = `${baseUrl}/api/blogs${queryString ? `?${queryString}` : ''}`;
+    // Simplify URL construction like the quiz API
+    const url = `/api/blogs${queryString ? `?${queryString}` : ''}`;
     console.log("Fetching blogs from:", url);
     
     const response = await fetch(
@@ -54,9 +51,8 @@ export async function getBlogs(params?: {
 
 export async function getBlogByIdOrSlug(idOrSlug: string) {
   try {
-    const baseUrl = process.env.NEXT_PUBLIC_API_URL || 
-                  (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000');
-    const url = `${baseUrl}/api/blogs/${idOrSlug}`;
+    // Simplify URL construction like the quiz API
+    const url = `/api/blogs/${idOrSlug}`;
     
     const response = await fetch(
       url,
@@ -77,9 +73,8 @@ export async function getBlogByIdOrSlug(idOrSlug: string) {
 
 export async function createBlog(data: BlogData) {
   try {
-    const baseUrl = process.env.NEXT_PUBLIC_API_URL || 
-                  (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000');
-    const url = `${baseUrl}/api/blogs`;
+    // Simplify URL construction like the quiz API
+    const url = '/api/blogs';
     
     const response = await fetch(
       url,
@@ -106,9 +101,8 @@ export async function createBlog(data: BlogData) {
 
 export async function updateBlog(id: string, data: BlogData) {
   try {
-    const baseUrl = process.env.NEXT_PUBLIC_API_URL || 
-                  (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000');
-    const url = `${baseUrl}/api/blogs/${id}`;
+    // Simplify URL construction like the quiz API
+    const url = `/api/blogs/${id}`;
     
     const response = await fetch(
       url,
@@ -137,9 +131,8 @@ export async function updateBlog(id: string, data: BlogData) {
 
 export async function deleteBlog(id: string) {
   try {
-    const baseUrl = process.env.NEXT_PUBLIC_API_URL || 
-                  (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000');
-    const url = `${baseUrl}/api/blogs/${id}`;
+    // Simplify URL construction like the quiz API
+    const url = `/api/blogs/${id}`;
     
     const response = await fetch(
       url,
