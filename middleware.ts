@@ -10,7 +10,6 @@ const isAdminRoute = (path: string) => {
 
 const isAdminApiRoute = (path: string) => {
   return path.startsWith('/api/admin') || 
-         path.startsWith('/api/flashcards') || 
          path.startsWith('/api/admin/question-banks')
 }
 
