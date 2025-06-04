@@ -11,8 +11,6 @@ const isAdminRoute = (path: string) => {
 const isAdminApiRoute = (path: string) => {
   return path.startsWith('/api/admin') || 
          path.startsWith('/api/flashcards') || 
-         path.startsWith('/api/quizzes') || 
-         path.startsWith('/api/study-materials') ||
          path.startsWith('/api/admin/question-banks')
 }
 
