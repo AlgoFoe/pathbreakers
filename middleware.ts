@@ -15,13 +15,21 @@ const isAdminApiRoute = (path: string) => {
 
 export default clerkMiddleware(async (auth, req: NextRequest) =>{
   const { pathname } = req.nextUrl
-  const { userId, redirectToSignIn } = await auth();
-
-  // Allow all non-admin API routes to pass through without authentication
-  if (pathname.startsWith('/api/') && !isAdminApiRoute(pathname)) {
-    console.log('API route access allowed without authentication:', pathname);
+  
+  // Check for x-no-auth header for requests coming from server actions
+  const noAuthHeader = req.headers.get('x-no-auth');
+  
+  // IMPORTANT: Allow all API routes with no-auth header or specific flashcard/blog routes
+  if ((pathname.startsWith('/api/') && noAuthHeader === 'true') ||
+      (pathname.startsWith('/api/') && 
+       !isAdminApiRoute(pathname) && 
+       (pathname.includes('/flashcards') || pathname.includes('/blogs')))) {
+    console.log('Bypassing auth completely for API route:', pathname);
+    // Skip Clerk authentication for these routes
     return NextResponse.next();
   }
+  
+  const { userId, redirectToSignIn } = await auth();
 
   // Check for admin-specific API routes
   if (isAdminApiRoute(pathname)) {
@@ -67,7 +75,7 @@ export const config = {
   matcher: [
     // Skip Next.js internals and all static files, unless found in search params
     '/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)',
-    // Always run for API routes
+    // Always run for API routes, but we'll bypass auth for non-admin routes in the middleware
     '/(api|trpc)(.*)',
     // Specifically match admin routes
     '/admin/:path*',

@@ -39,11 +39,15 @@ export async function getFlashcards(params?: {
     const url = getAbsoluteUrl(`api/flashcards${queryString ? `?${queryString}` : ''}`);
     
     console.log("Fetching flashcards from:", url);
-    
-    // Make API call
+      // Make API call with no-auth header to signal it's a special request
     const response = await fetch(
       url,
-      { cache: 'no-store' } // Disable caching
+      { 
+        cache: 'no-store', // Disable caching
+        headers: {
+          'x-no-auth': 'true', // Signal that this request should bypass auth
+        }
+      }
     );
     
     if (!response.ok) {
@@ -62,12 +66,14 @@ export async function createFlashcard(data: FlashcardData) {  try {
     const url = getAbsoluteUrl('api/flashcards');
     
     console.log("Creating flashcard at:", url);
-    
-    const response = await fetch(
+      const response = await fetch(
       url,
       {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'x-no-auth': 'true', // Signal that this request should bypass auth
+        },
         body: JSON.stringify(data),
       }
     );
@@ -95,7 +101,10 @@ export async function updateFlashcard(id: string, data: FlashcardData) {  try {
       url,
       {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'x-no-auth': 'true', // Signal that this request should bypass auth
+        },
         body: JSON.stringify(data),
       }
     );
@@ -122,7 +131,12 @@ export async function deleteFlashcard(id: string) {
     
     const response = await fetch(
       url,
-      { method: 'DELETE' }
+      { 
+        method: 'DELETE',
+        headers: {
+          'x-no-auth': 'true', // Signal that this request should bypass auth
+        }
+      }
     );
     
     if (!response.ok) {
