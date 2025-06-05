@@ -1,26 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 import { connectToDatabase } from "@/lib/database/mongoose";
 import Blog from "@/lib/database/models/blog.model";
-import { auth } from "@clerk/nextjs/server";
 import { revalidatePath } from "next/cache";
+import { auth } from "@clerk/nextjs/server";
 
 export async function PATCH(
   req: NextRequest,
   { params }: { params: { blogId: string } } // Changed from 'id' to 'blogId'
 ) {
   try {
-    // Check authentication - require admin
     const { userId } = auth();
-    
-    if (!userId) {
-      return NextResponse.json(
-        { success: false, message: "Unauthorized" },
-        { status: 401 }
-      );
-    }
-    // In a real production app, we would check user role from Clerk metadata
-    // For now, we'll check if the user is the author of the blog
-    
     await connectToDatabase();
     const blog = await Blog.findById(params.blogId); // Changed from 'id' to 'blogId'
     
