@@ -11,13 +11,18 @@ export interface FlashcardData {
   difficulty: string;
 }
 
-// Helper function to get the base URL for API calls
-function getBaseUrl() {
-  // Get the host from the request headers
-  const headersList = headers();
-  const host = headersList.get('host') || 'localhost:3000';
-  const protocol = host.includes('localhost') ? 'http' : 'https';
-  return `${protocol}://${host}`;
+// Function to create an absolute URL for API calls that works in all environments
+function getAbsoluteUrl(path: string): string {
+  // Remove leading slash if present for consistency
+  const cleanPath = path.startsWith('/') ? path.slice(1) : path;
+  
+  // Add 'https://' to VERCEL_URL (this is how Vercel provides it)
+  if (process.env.VERCEL_URL) {
+    return `https://${process.env.VERCEL_URL}/${cleanPath}`;
+  }
+  
+  // For local development, use localhost
+  return `http://localhost:3000/${cleanPath}`;
 }
 
 export async function getFlashcards(params?: {
@@ -31,9 +36,8 @@ export async function getFlashcards(params?: {
     if (params?.difficulty) queryParams.append("difficulty", params.difficulty);
     if (params?.query) queryParams.append("query", params.query);
     
-    const queryString = queryParams.toString();    // Get the base URL for API calls
-    const baseUrl = getBaseUrl();
-    const url = `${baseUrl}/api/flashcards${queryString ? `?${queryString}` : ''}`;
+    const queryString = queryParams.toString();
+    const url = getAbsoluteUrl(`api/flashcards${queryString ? `?${queryString}` : ''}`);
     
     console.log("Fetching flashcards from:", url);
     
@@ -55,9 +59,8 @@ export async function getFlashcards(params?: {
   }
 }
 
-export async function createFlashcard(data: FlashcardData) {  try {    // Get the base URL for API calls
-    const baseUrl = getBaseUrl();
-    const url = `${baseUrl}/api/flashcards`;
+export async function createFlashcard(data: FlashcardData) {  try {
+    const url = getAbsoluteUrl('api/flashcards');
     
     console.log("Creating flashcard at:", url);
     
@@ -84,9 +87,8 @@ export async function createFlashcard(data: FlashcardData) {  try {    // Get th
   }
 }
 
-export async function updateFlashcard(id: string, data: FlashcardData) {  try {    // Get the base URL for API calls
-    const baseUrl = getBaseUrl();
-    const url = `${baseUrl}/api/flashcards/${id}`;
+export async function updateFlashcard(id: string, data: FlashcardData) {  try {
+    const url = getAbsoluteUrl(`api/flashcards/${id}`);
     
     console.log("Updating flashcard at:", url);
     
@@ -114,9 +116,8 @@ export async function updateFlashcard(id: string, data: FlashcardData) {  try { 
 }
 
 export async function deleteFlashcard(id: string) {
-  try {    // Get the base URL for API calls
-    const baseUrl = getBaseUrl();
-    const url = `${baseUrl}/api/flashcards/${id}`;
+  try {
+    const url = getAbsoluteUrl(`api/flashcards/${id}`);
     
     console.log("Deleting flashcard at:", url);
     

@@ -3,13 +3,23 @@
 import { revalidatePath } from "next/cache";
 import { headers } from "next/headers";
 
-// Helper function to get the base URL for API calls
-function getBaseUrl() {
-  // Get the host from the request headers
-  const headersList = headers();
-  const host = headersList.get('host') || 'localhost:3000';
-  const protocol = host.includes('localhost') ? 'http' : 'https';
-  return `${protocol}://${host}`;
+// Helper function to check if a URL is absolute
+function isAbsoluteUrl(url: string): boolean {
+  return /^https?:\/\//i.test(url);
+}
+
+// Function to create an absolute URL for API calls that works in all environments
+function getAbsoluteUrl(path: string): string {
+  // Remove leading slash if present for consistency
+  const cleanPath = path.startsWith('/') ? path.slice(1) : path;
+  
+  // Add 'https://' to VERCEL_URL (this is how Vercel provides it)
+  if (process.env.VERCEL_URL) {
+    return `https://${process.env.VERCEL_URL}/${cleanPath}`;
+  }
+  
+  // For local development, use localhost
+  return `http://localhost:3000/${cleanPath}`;
 }
 
 export interface BlogData {
@@ -28,7 +38,8 @@ export async function getBlogs(params?: {
   tag?: string;
   limit?: number;
   page?: number;
-}) {  try {
+}) {  
+  try {
     // Build query string from params
     const queryParams = new URLSearchParams();
     
@@ -37,10 +48,7 @@ export async function getBlogs(params?: {
     if (params?.limit) queryParams.append("limit", params.limit.toString());
     if (params?.page) queryParams.append("page", params.page.toString());
       const queryString = queryParams.toString();
-    
-    // Get the base URL for API calls
-    const baseUrl = getBaseUrl();
-    const url = `${baseUrl}/api/blogs${queryString ? `?${queryString}` : ''}`;
+    const url = getAbsoluteUrl(`api/blogs${queryString ? `?${queryString}` : ''}`);
     console.log("Fetching blogs from:", url);
     
     const response = await fetch(
@@ -60,10 +68,8 @@ export async function getBlogs(params?: {
   }
 }
 
-export async function getBlogByIdOrSlug(idOrSlug: string) {
-  try {    // Get the base URL for API calls
-    const baseUrl = getBaseUrl();
-    const url = `${baseUrl}/api/blogs/${idOrSlug}`;
+export async function getBlogByIdOrSlug(idOrSlug: string) {  try {
+    const url = getAbsoluteUrl(`api/blogs/${idOrSlug}`);
     
     const response = await fetch(
       url,
@@ -82,10 +88,8 @@ export async function getBlogByIdOrSlug(idOrSlug: string) {
   }
 }
 
-export async function createBlog(data: BlogData) {
-  try {    // Get the base URL for API calls
-    const baseUrl = getBaseUrl();
-    const url = `${baseUrl}/api/blogs`;
+export async function createBlog(data: BlogData) {  try {
+    const url = getAbsoluteUrl('api/blogs');
     
     const response = await fetch(
       url,
@@ -112,9 +116,7 @@ export async function createBlog(data: BlogData) {
 
 export async function updateBlog(id: string, data: BlogData) {
   try {
-    // Get the base URL for API calls
-    const baseUrl = getBaseUrl();
-    const url = `${baseUrl}/api/blogs/${id}`;
+    const url = getAbsoluteUrl(`api/blogs/${id}`);
     
     const response = await fetch(
       url,
@@ -143,9 +145,7 @@ export async function updateBlog(id: string, data: BlogData) {
 
 export async function deleteBlog(id: string) {
   try {
-    // Get the base URL for API calls
-    const baseUrl = getBaseUrl();
-    const url = `${baseUrl}/api/blogs/${id}`;
+    const url = getAbsoluteUrl(`api/blogs/${id}`);
     
     const response = await fetch(
       url,
