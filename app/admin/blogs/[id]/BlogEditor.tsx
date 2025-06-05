@@ -87,9 +87,24 @@ export default function BlogEditor({ params }: { params?: { id: string } }) {
             ),
             duration: 10000
           });
+            // Upload image
+          const formData = new FormData();
+          formData.append('image', file);
           
-          // Upload image
-          const imageUrl = await BlogService.uploadCoverImage(file);
+          const uploadResponse = await fetch('/api/upload/image', {
+            method: 'POST',
+            headers: {
+              'x-no-auth': 'true'
+            },
+            body: formData
+          });
+          
+          if (!uploadResponse.ok) {
+            throw new Error(`Upload failed: ${uploadResponse.status}`);
+          }
+          
+          const uploadData = await uploadResponse.json();
+          const imageUrl = uploadData.url;
           
           // Safer way to insert image into content
           // Without manipulating the Quill instance directly
@@ -150,14 +165,27 @@ export default function BlogEditor({ params }: { params?: { id: string } }) {
     'blockquote', 'code-block',
     'color', 'background'
   ];
-
   // Load blog data if editing
   useEffect(() => {
     const loadBlog = async () => {
       if (isEditing && params?.id) {
         try {
           setIsLoading(true);
-          const blog = await BlogService.getBlogByIdOrSlug(params.id);
+          
+          const response = await fetch(`/api/blogs/${params.id}`, {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json',
+              'x-no-auth': 'true'
+            }
+          });
+          
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+          
+          const data = await response.json();
+          const blog = data.data;
           
           if (blog) {
             setTitle(blog.title || "");
@@ -258,12 +286,27 @@ export default function BlogEditor({ params }: { params?: { id: string } }) {
         setIsSubmitting(false);
         return;
       }
-      
-      // If we have a new image file, upload it first
+        // If we have a new image file, upload it first
       let imageUrl = coverImage;
       if (imageFile) {
         try {
-          imageUrl = await BlogService.uploadCoverImage(imageFile);
+          const formData = new FormData();
+          formData.append('image', imageFile);
+          
+          const uploadResponse = await fetch('/api/upload/image', {
+            method: 'POST',
+            headers: {
+              'x-no-auth': 'true'
+            },
+            body: formData
+          });
+          
+          if (!uploadResponse.ok) {
+            throw new Error(`Upload failed: ${uploadResponse.status}`);
+          }
+          
+          const uploadData = await uploadResponse.json();
+          imageUrl = uploadData.url;
         } catch (error) {
           console.error("Error uploading image:", error);
           toast({ 
@@ -297,10 +340,42 @@ export default function BlogEditor({ params }: { params?: { id: string } }) {
       }
       
       // Create or update blog
+      let response;
       if (isEditing && params?.id) {
-        await BlogService.updateBlog(params.id, blogData);
+        response = await fetch(`/api/blogs/${params.id}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-no-auth': 'true'
+          },
+          body: JSON.stringify(blogData)
+        });
       } else {
-        await BlogService.createBlog(blogData);
+        // Generate a slug from the title if not provided
+        if (!blogData.slug) {
+          blogData.slug = blogData.title
+            .toLowerCase()
+            .replace(/[^a-z0-9]+/g, '-')
+            .replace(/^-+|-+$/g, '');
+        }
+
+        // Set author to admin if not provided
+        if (!blogData.authorId) {
+          blogData.authorId = 'admin';
+        }
+
+        response = await fetch('/api/blogs', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-no-auth': 'true'
+          },
+          body: JSON.stringify(blogData)
+        });
+      }
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
       
       toast({

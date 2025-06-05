@@ -2,20 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { writeFile } from "fs/promises";
 import { join } from "path";
 import { v4 as uuidv4 } from "uuid";
-import { auth } from "@clerk/nextjs/server";
 
 export async function POST(req: NextRequest) {
   try {
-    // Check authentication - require admin access
-    const { userId } = auth();
-    
-    if (!userId) {
-      return NextResponse.json(
-        { success: false, message: "Unauthorized" },
-        { status: 401 }
-      );
-    }
-    
     // Get form data with the uploaded file
     const formData = await req.formData();
     const file = formData.get("image") as File;
@@ -43,7 +32,7 @@ export async function POST(req: NextRequest) {
         { success: false, message: "File size exceeds 5MB limit" },
         { status: 400 }
       );
-    }    // Generate unique filename
+    }// Generate unique filename
     const fileExtension = file.name.split('.').pop();
     const fileName = `${uuidv4()}.${fileExtension}`;
     const bytes = await file.arrayBuffer();

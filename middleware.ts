@@ -17,9 +17,8 @@ export default clerkMiddleware(async (auth, req: NextRequest) =>{
   const { pathname } = req.nextUrl
   
   console.log(`[Middleware] Processing: ${pathname}`);
-  
-  // SIMPLE: Allow all blog and flashcard API routes without any auth
-  if (pathname.startsWith('/api/blogs') || pathname.startsWith('/api/flashcards')) {
+    // SIMPLE: Allow all blog, flashcard, and upload API routes without any auth
+  if (pathname.startsWith('/api/blogs') || pathname.startsWith('/api/flashcards') || pathname.startsWith('/api/upload')) {
     console.log('Bypassing auth completely for API route:', pathname);
     return NextResponse.next();
   }
