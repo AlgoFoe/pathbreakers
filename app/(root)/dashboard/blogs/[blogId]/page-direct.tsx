@@ -18,13 +18,11 @@ export async function generateMetadata(
 ): Promise<Metadata> {
   try {
     // Construct URL properly depending on environment
-    let baseUrl;
-    if (process.env.NEXT_PUBLIC_APP_URL) {
-      baseUrl = process.env.NEXT_PUBLIC_APP_URL;
-    } else if (process.env.VERCEL_URL) {
-      baseUrl = `https://${process.env.VERCEL_URL}`;
-    } else {
-      baseUrl = 'http://localhost:3000';
+    let baseUrl = process.env.NEXT_PUBLIC_APP_URL;
+    if (!baseUrl) {
+      baseUrl = process.env.VERCEL_URL 
+        ? `https://${process.env.VERCEL_URL}` 
+        : 'http://localhost:3000';
     }
     
     const response = await fetch(`${baseUrl}/api/blogs/${params.blogId}`, {
@@ -72,15 +70,14 @@ const BlogPage = async ({ params }: BlogPageProps) => {
   const { userId } = auth();
   const user = await currentUser();
   const isAdmin = user?.publicMetadata?.role === 'admin';
-    try {
+  
+  try {
     // Construct URL properly depending on environment
-    let baseUrl;
-    if (process.env.NEXT_PUBLIC_APP_URL) {
-      baseUrl = process.env.NEXT_PUBLIC_APP_URL;
-    } else if (process.env.VERCEL_URL) {
-      baseUrl = `https://${process.env.VERCEL_URL}`;
-    } else {
-      baseUrl = 'http://localhost:3000';
+    let baseUrl = process.env.NEXT_PUBLIC_APP_URL;
+    if (!baseUrl) {
+      baseUrl = process.env.VERCEL_URL 
+        ? `https://${process.env.VERCEL_URL}` 
+        : 'http://localhost:3000';
     }
     
     // Make API call with x-no-auth header
@@ -163,8 +160,7 @@ const BlogPage = async ({ params }: BlogPageProps) => {
             <AdminActions 
               blogId={blog._id} 
               isPublished={blog.published} 
-              // Remove the slug prop if it's not needed
-              // or update the AdminActionsProps interface in the component
+              // Remove the slug prop if it's not needed in AdminActions
             />
           )}
         </div>
