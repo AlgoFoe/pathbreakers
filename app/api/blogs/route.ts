@@ -83,10 +83,9 @@ export async function POST(req: NextRequest) {
       metaDescription,
       scheduledPublishDate
     } = data;
-    
-    if (!title || !summary || !content || !coverImage) {
+      if (!title || !summary || !content) {
       return NextResponse.json(
-        { success: false, message: "Missing required fields" },
+        { success: false, message: "Missing required fields: title, summary, and content are required" },
         { status: 400 }
       );
     }        // Create a new blog post
@@ -94,7 +93,7 @@ export async function POST(req: NextRequest) {
       title,
       summary,
       content,
-      coverImage,
+      coverImage: coverImage || "https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2072&q=80", // Default placeholder image
       authorId: "anonymous",  // Remove auth requirement
       slug: slug || undefined,
       tags: tags || [],
