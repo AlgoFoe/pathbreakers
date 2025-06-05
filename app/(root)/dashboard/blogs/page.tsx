@@ -20,7 +20,7 @@ const BlogsPage = async () => {
     const isAdmin = user?.publicMetadata?.role === 'admin';
     
     // If admin, fetch all blogs; otherwise, fetch only published blogs
-    const response = await fetch(`${process.env.VERCEL_URL || 'http://localhost:3000'}/api/blogs${isAdmin ? '' : '?published=true'}`, {
+    const response = await fetch(`https://${process.env.VERCEL_URL || 'http://localhost:3000'}/api/blogs${isAdmin ? '' : '?published=true'}`, {
       cache: 'no-store',
       headers: {
         'Content-Type': 'application/json'
