@@ -1,7 +1,6 @@
 import React from 'react';
 import { Metadata } from 'next';
 import BlogsDirect from './blogs-direct';
-import { auth, currentUser } from '@clerk/nextjs/server';
 
 export const metadata: Metadata = {
   title: 'Blogs | Pathbreakers',
@@ -11,13 +10,10 @@ export const metadata: Metadata = {
 const BlogsPage = async () => {
   let initialBlogs = [];
   let tags: string[] = [];
-  
-  try {
-    // Check if user is admin
-    const { userId } = auth();
-    const user = await currentUser();
-    const isAdmin = user?.publicMetadata?.role === 'admin';
-      // If admin, fetch all blogs; otherwise, fetch only published blogs
+    try {
+    // Remove auth requirement - show all blogs to everyone
+    const isAdmin = true;
+      // Fetch all blogs
     const baseUrl = process.env.VERCEL_URL 
       ? `https://${process.env.VERCEL_URL}` 
       : 'http://localhost:3000';

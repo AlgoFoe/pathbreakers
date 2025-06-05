@@ -3,7 +3,6 @@ import { CalendarIcon, Tag, User2 } from 'lucide-react';
 import { Metadata, ResolvingMetadata } from 'next';
 import Image from 'next/image';
 import { notFound } from 'next/navigation';
-import { auth, currentUser } from '@clerk/nextjs/server';
 import AdminActions from '@/components/blogs/AdminActions';
 
 interface BlogPageProps {
@@ -68,10 +67,8 @@ export async function generateMetadata(
 const BlogPage = async ({ params }: BlogPageProps) => {
   let blog;
   
-  // Check if user is admin
-  const { userId } = auth();
-  const user = await currentUser();
-  const isAdmin = user?.publicMetadata?.role === 'admin';
+  // Remove auth requirement - allow admin actions for all users
+  const isAdmin = true;
     try {
     // Construct URL properly depending on environment
     let baseUrl;

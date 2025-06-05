@@ -1,20 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { connectToDatabase } from "@/lib/database/mongoose";
 import Blog from "@/lib/database/models/blog.model";
-import { auth } from "@clerk/nextjs/server";
-
-// Helper function to check if user is the author or an admin
-async function isAuthorizedToModify(blogId: string, userId: string) {
-  try {
-    const blog = await Blog.findById(blogId);
-    if (!blog) return false;
-    
-    return blog.authorId === userId;
-  } catch (error) {
-    console.error("Error checking authorization:", error);
-    return false;
-  }
-}
 
 export async function GET(
   req: NextRequest,
@@ -22,12 +8,9 @@ export async function GET(
 ) {
   try {
     const { blogId } = params;
-    // Get auth info
-    const { userId } = auth();
     
     console.log(`[Blog API] Received request for blogId: ${blogId}`);
     console.log(`[Blog API] Request URL: ${req.url}`);
-    console.log(`[Blog API] User ID: ${userId}`);
     
     if (!blogId) {
       console.log('[Blog API] No blogId provided');
@@ -100,8 +83,6 @@ export async function PUT(
   { params }: { params: { blogId: string } }
 ) {
   try {
-    // Get user ID if available, but don't require it
-    const { userId } = auth();
     const { blogId } = params;
 
     if (!blogId) {
@@ -113,20 +94,7 @@ export async function PUT(
 
     await connectToDatabase();
 
-    // Check if user is authorized to modify this blog
-    if (!userId) {
-      return NextResponse.json(
-        { success: false, message: "Authentication required" },
-        { status: 401 }
-      );
-    }
-    const isAuthorized = await isAuthorizedToModify(blogId, userId);
-    if (!isAuthorized) {
-      return NextResponse.json(
-        { success: false, message: "Not authorized to modify this blog" },
-        { status: 403 }
-      );
-    }    const data = await req.json();
+    const data = await req.json();
     const { 
       title, 
       summary, 
@@ -198,8 +166,6 @@ export async function DELETE(
   { params }: { params: { blogId: string } }
 ) {
   try {
-    // Get user ID if available, but don't require it
-    const { userId } = auth();
     const { blogId } = params;
 
     if (!blogId) {

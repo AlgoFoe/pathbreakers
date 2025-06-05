@@ -1,28 +1,23 @@
 import { NextRequest, NextResponse } from "next/server";
 import { connectToDatabase } from "@/lib/database/mongoose";
 import Blog from "@/lib/database/models/blog.model";
-import { auth } from "@clerk/nextjs/server";
 
 export async function GET(req: NextRequest) {
   try {
-    await connectToDatabase();
-
-    // Get query parameters for filtering
+    await connectToDatabase();    // Get query parameters for filtering
     const searchParams = req.nextUrl.searchParams;
     const query = searchParams.get("query");
     const tag = searchParams.get("tag");
     const limit = parseInt(searchParams.get("limit") || "10");
     const page = parseInt(searchParams.get("page") || "1");
     const publishedParam = searchParams.get("published");
-      // Get user ID if available, but don't require it
-    const { userId } = auth();
     
     // Build the search filter
     const filter: any = {};
     
-    // Handle published status
-    if (publishedParam === 'false' && userId) {
-      // Allow filtering for unpublished blogs if user is logged in
+    // Handle published status - allow access to all blogs without auth
+    if (publishedParam === 'false') {
+      // Allow filtering for unpublished blogs
       filter.published = false;
     } else if (publishedParam === 'true' || !publishedParam) {
       // Default to showing published blogs
@@ -71,9 +66,6 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
-    // Get user ID if available, but don't require it
-    const { userId } = auth();
-
     await connectToDatabase();
     
     const data = await req.json();
@@ -97,14 +89,13 @@ export async function POST(req: NextRequest) {
         { success: false, message: "Missing required fields" },
         { status: 400 }
       );
-    }      
-    // Create a new blog post
+    }        // Create a new blog post
     const newBlog = await Blog.create({
       title,
       summary,
       content,
       coverImage,
-      authorId: String(userId),  
+      authorId: "anonymous",  // Remove auth requirement
       slug: slug || undefined,
       tags: tags || [],
       category: category || 'Uncategorized',
