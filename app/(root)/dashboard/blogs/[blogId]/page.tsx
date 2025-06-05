@@ -132,15 +132,6 @@ const BlogPage = ({ params }: BlogPageProps) => {
               <time>{formattedDate}</time>
             </div>
           </div>
-          
-          {isAdmin && (
-            <AdminActions 
-              blogId={blog._id} 
-              isPublished={blog.published} 
-              // Remove the slug prop if it's not needed
-              // or update the AdminActionsProps interface in the component
-            />
-          )}
         </div>
 
         {/* Blog Content */}
