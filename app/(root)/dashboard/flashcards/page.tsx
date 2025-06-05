@@ -305,7 +305,6 @@ const FlashcardsPage = () => {
 
   return (
     <div className="container mx-auto py-6 space-y-6 max-w-7xl">
-      <h1 className="text-3xl font-bold">Flashcards</h1>
         <FilterBar 
         searchQuery={searchQuery}
         setSearchQuery={setSearchQuery}

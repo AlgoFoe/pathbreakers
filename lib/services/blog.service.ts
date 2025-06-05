@@ -20,7 +20,7 @@ export interface BlogData {
   updatedAt?: Date;
 }
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
+const API_URL = process.env.VERCEL_URL || 'http://localhost:3000';
 
 export const BlogService = {
   // Get all blogs with filtering, pagination
