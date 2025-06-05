@@ -2,14 +2,12 @@ import { NextRequest, NextResponse } from "next/server";
 import { connectToDatabase } from "@/lib/database/mongoose";
 import Blog from "@/lib/database/models/blog.model";
 import { revalidatePath } from "next/cache";
-import { auth } from "@clerk/nextjs/server";
 
 export async function PATCH(
   req: NextRequest,
   { params }: { params: { blogId: string } } // Changed from 'id' to 'blogId'
 ) {
   try {
-    const { userId } = auth();
     await connectToDatabase();
     const blog = await Blog.findById(params.blogId); // Changed from 'id' to 'blogId'
     
@@ -19,16 +17,6 @@ export async function PATCH(
         { status: 404 }
       );
     }
-    
-    // Check if user is author of the blog
-    if (blog.authorId !== userId) {
-      return NextResponse.json(
-        { success: false, message: "You don't have permission to update this blog" },
-        { status: 403 }
-      );
-    }
-
-    await connectToDatabase();
 
     // Get published status from request body
     const { published } = await req.json();
@@ -45,7 +33,7 @@ export async function PATCH(
         { success: false, message: "Failed to update blog status" },
         { status: 500 }
       );
-    }    // Revalidate related paths to update cache
+    }// Revalidate related paths to update cache
     revalidatePath("/dashboard/blogs");
     revalidatePath("/admin/blogs");
     revalidatePath(`/dashboard/blogs/${params.blogId}`);
