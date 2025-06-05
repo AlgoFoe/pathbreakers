@@ -49,14 +49,8 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
+    // Get user ID if available, but don't require it
     const { userId } = auth();
-
-    if (!userId) {
-      return NextResponse.json(
-        { success: false, message: "Unauthorized" },
-        { status: 401 }
-      );
-    }
 
     await connectToDatabase();
     

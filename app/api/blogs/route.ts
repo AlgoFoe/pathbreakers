@@ -14,23 +14,18 @@ export async function GET(req: NextRequest) {
     const limit = parseInt(searchParams.get("limit") || "10");
     const page = parseInt(searchParams.get("page") || "1");
     const publishedParam = searchParams.get("published");
-    
-    // Check if user is admin
+      // Get user ID if available, but don't require it
     const { userId } = auth();
     
     // Build the search filter
     const filter: any = {};
     
-    // Only admins can see unpublished blogs
-    if (userId && publishedParam !== undefined) {
-      // Admin can filter by published status
-      if (publishedParam === 'true') {
-        filter.published = true;
-      } else if (publishedParam === 'false') {
-        filter.published = false;
-      }
-    } else {
-      // Non-admin users can only see published blogs
+    // Handle published status
+    if (publishedParam === 'false' && userId) {
+      // Allow filtering for unpublished blogs if user is logged in
+      filter.published = false;
+    } else if (publishedParam === 'true' || !publishedParam) {
+      // Default to showing published blogs
       filter.published = true;
     }
 
@@ -76,14 +71,8 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
+    // Get user ID if available, but don't require it
     const { userId } = auth();
-
-    if (!userId) {
-      return NextResponse.json(
-        { success: false, message: "Unauthorized" },
-        { status: 401 }
-      );
-    }
 
     await connectToDatabase();
     

@@ -17,6 +17,12 @@ export default clerkMiddleware(async (auth, req: NextRequest) =>{
   const { pathname } = req.nextUrl
   const { userId, redirectToSignIn } = await auth();
 
+  // Allow all non-admin API routes to pass through without authentication
+  if (pathname.startsWith('/api/') && !isAdminApiRoute(pathname)) {
+    console.log('API route access allowed without authentication:', pathname);
+    return NextResponse.next();
+  }
+
   // Check for admin-specific API routes
   if (isAdminApiRoute(pathname)) {
     // Get the admin auth cookie

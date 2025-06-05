@@ -37,14 +37,8 @@ export async function PUT(
   { params }: { params: { flashcardId: string } }
 ) {
   try {
+    // Get user ID if available, but don't require it
     const { userId } = auth();
-
-    if (!userId) {
-      return NextResponse.json(
-        { success: false, message: "Unauthorized" },
-        { status: 401 }
-      );
-    }
 
     await connectToDatabase();
     
@@ -94,14 +88,8 @@ export async function DELETE(
   { params }: { params: { flashcardId: string } }
 ) {
   try {
+    // Get user ID if available, but don't require it
     const { userId } = auth();
-
-    if (!userId) {
-      return NextResponse.json(
-        { success: false, message: "Unauthorized" },
-        { status: 401 }
-      );
-    }
 
     await connectToDatabase();
 

@@ -1,7 +1,6 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { headers } from "next/headers";
 
 // Helper function to check if a URL is absolute
 function isAbsoluteUrl(url: string): boolean {
