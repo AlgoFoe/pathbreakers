@@ -17,11 +17,17 @@ const BlogsPage = async () => {
     const { userId } = auth();
     const user = await currentUser();
     const isAdmin = user?.publicMetadata?.role === 'admin';
-      // If admin, fetch all blogs; otherwise, fetch only published blogs
-    const baseUrl = process.env.VERCEL_URL 
-      ? `https://${process.env.VERCEL_URL}` 
-      : 'http://localhost:3000';
-      const response = await fetch(`${baseUrl}/api/blogs${isAdmin ? '' : '?published=true'}`, {
+    
+    // If admin, fetch all blogs; otherwise, fetch only published blogs
+    // Construct URL properly depending on environment
+    let baseUrl = process.env.NEXT_PUBLIC_APP_URL;
+    if (!baseUrl) {
+      baseUrl = process.env.VERCEL_URL 
+        ? `https://${process.env.VERCEL_URL}` 
+        : 'http://localhost:3000';
+    }
+    
+    const response = await fetch(`${baseUrl}/api/blogs${isAdmin ? '' : '?published=true'}`, {
       cache: 'no-store',
       headers: {
         'Content-Type': 'application/json',
@@ -46,7 +52,8 @@ const BlogsPage = async () => {
     initialBlogs = [];
     tags = [];
   }
-    return (
+  
+  return (
     <div className="container mx-auto py-6 max-w-7xl">
       <BlogsDirect 
         initialBlogs={initialBlogs}
