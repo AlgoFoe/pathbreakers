@@ -9,10 +9,13 @@ import { motion } from "framer-motion";
 interface CategoryCardProps {
   category: string;
   count: number;
+  cardCount?: number; // Adding this for backwards compatibility
   onClick: () => void;
 }
 
-const CategoryCard: React.FC<CategoryCardProps> = ({ category, count, onClick }) => {
+const CategoryCard: React.FC<CategoryCardProps> = ({ category, count, cardCount, onClick }) => {
+  // Use cardCount if provided, otherwise fall back to count
+  const displayCount = cardCount !== undefined ? cardCount : count;
   // Get a consistent color based on the category name
   const getColorClass = (str: string) => {
     const colors = [
@@ -49,10 +52,9 @@ const CategoryCard: React.FC<CategoryCardProps> = ({ category, count, onClick })
         onClick={onClick}
       >
         <CardHeader>
-          <div className="flex justify-between items-center">
-            <CardTitle className="text-lg font-medium">{category}</CardTitle>
+          <div className="flex justify-between items-center">            <CardTitle className="text-lg font-medium">{category}</CardTitle>
             <Badge variant="outline" className="bg-white bg-opacity-70 backdrop-blur-sm">
-              {count} {count === 1 ? 'card' : 'cards'}
+              {displayCount} {displayCount === 1 ? 'card' : 'cards'}
             </Badge>
           </div>
         </CardHeader>

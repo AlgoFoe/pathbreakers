@@ -11,7 +11,6 @@ import { Card } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Loader2 } from 'lucide-react';
 import useDebounce from '@/hooks/useDebounce';
-import { metadata } from './metadata';
 
 interface FlashcardType {
   _id: string;
@@ -306,7 +305,7 @@ const FlashcardsPage = () => {
   return (
     <div className="container mx-auto py-6 space-y-6 max-w-7xl">
       <h1 className="text-3xl font-bold">Flashcards</h1>
-        <FilterBar 
+      <FilterBar 
         searchQuery={searchQuery}
         setSearchQuery={setSearchQuery}
         selectedCategory={selectedCategory}
@@ -338,7 +337,7 @@ const FlashcardsPage = () => {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {Object.entries(flashcardsByCategory).map(([category, cards]) => (
-            <CategoryCard 
+           <CategoryCard 
               key={category}
               category={category}
               count={cards.length}
@@ -362,7 +361,7 @@ const FlashcardsPage = () => {
         categories={allCategories}
       />
 
-      <FlashcardCarouselModal 
+     <FlashcardCarouselModal 
         isOpen={isCarouselModalOpen}
         onClose={() => setIsCarouselModalOpen(false)}
         flashcards={filteredCards.filter(card => card.category === selectedCategoryForModal)}

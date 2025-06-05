@@ -21,6 +21,7 @@ interface FlashcardCarouselModalProps {
   flashcards: FlashcardType[];
   categoryName: string;
   onEdit?: (id: string) => void;
+  onEditCard?: (id: string) => void; // Adding this for backwards compatibility
   onDelete?: (id: string) => void;
 }
 
@@ -29,9 +30,11 @@ const FlashcardCarouselModal: React.FC<FlashcardCarouselModalProps> = ({
   onClose,
   flashcards,
   categoryName,
-  onEdit,
-  onDelete
+  onEdit,  onDelete,
+  onEditCard
 }) => {
+  // Use onEditCard if provided, otherwise fall back to onEdit
+  const handleEdit = onEditCard || onEdit;
   const [currentIndex, setCurrentIndex] = useState(0);
   const [direction, setDirection] = useState(0);
   
@@ -120,15 +123,14 @@ const FlashcardCarouselModal: React.FC<FlashcardCarouselModalProps> = ({
                   opacity: { duration: 0.2 }
                 }}
                 className="h-full w-full absolute"
-              >
-                {currentCard && (
+              >                {currentCard && (
                   <Flashcard
                     id={currentCard._id}
                     question={currentCard.question}
                     answer={currentCard.answer}
                     category={currentCard.category}
                     difficulty={currentCard.difficulty}
-                    onEdit={onEdit}
+                    onEdit={handleEdit}
                     onDelete={onDelete}
                   />
                 )}

@@ -1,4 +1,4 @@
-// "use server";
+"use server";
 
 // Define the Mentor type
 export interface Mentor {
