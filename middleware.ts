@@ -16,16 +16,20 @@ const isAdminApiRoute = (path: string) => {
 export default clerkMiddleware(async (auth, req: NextRequest) =>{
   const { pathname } = req.nextUrl
   
+  console.log(`[Middleware] Processing: ${pathname}`);
+  
+  // SIMPLE: Allow all blog and flashcard API routes without any auth
+  if (pathname.startsWith('/api/blogs') || pathname.startsWith('/api/flashcards')) {
+    console.log('Bypassing auth completely for API route:', pathname);
+    return NextResponse.next();
+  }
+  
   // Check for x-no-auth header for requests coming from server actions
   const noAuthHeader = req.headers.get('x-no-auth');
   
-  // IMPORTANT: Allow all API routes with no-auth header or specific flashcard/blog routes
-  if ((pathname.startsWith('/api/') && noAuthHeader === 'true') ||
-      (pathname.startsWith('/api/') && 
-       !isAdminApiRoute(pathname) && 
-       (pathname.includes('/flashcards') || pathname.includes('/blogs')))) {
-    console.log('Bypassing auth completely for API route:', pathname);
-    // Skip Clerk authentication for these routes
+  // Allow other API routes with no-auth header
+  if (pathname.startsWith('/api/') && noAuthHeader === 'true') {
+    console.log('Bypassing auth for API route with x-no-auth header:', pathname);
     return NextResponse.next();
   }
   
