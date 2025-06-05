@@ -20,8 +20,13 @@ export interface BlogData {
   updatedAt?: Date;
 }
 
-const API_URL = process.env.VERCEL_URL || 'http://localhost:3000';
-
+let API_URL = process.env.NEXT_PUBLIC_APP_URL;
+    if (!API_URL) {
+      API_URL = process.env.VERCEL_URL 
+        ? `https://${process.env.VERCEL_URL}` 
+        : 'http://localhost:3000';
+    }
+    
 export const BlogService = {
   // Get all blogs with filtering, pagination
   async getBlogs(params?: {
