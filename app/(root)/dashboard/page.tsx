@@ -280,7 +280,7 @@ export default function DashboardPage() {
                       <div className="flex items-center gap-3 mb-3 flex-wrap">
                         <span className="inline-flex items-center rounded-full bg-gray-200 px-2.5 py-0.5 text-xs">
                           <CalendarIcon className="h-3 w-3 mr-1" />
-                          May 26, 2025
+                          June 6, 2025
                         </span>
                         <span className="inline-flex items-center rounded-full bg-gray-200 px-2.5 py-0.5 text-xs">
                           <User className="h-3 w-3 mr-1" />
@@ -291,14 +291,10 @@ export default function DashboardPage() {
                         </span>
                       </div>
                       <h2 className="text-xl font-bold mb-2">
-                        How to Prepare for CUET: A Comprehensive Guide for
-                        Students
+                        CUET Made Simple — With Team Pathbreakers
                       </h2>
                       <p className="text-gray-700 mb-3 text-sm">
-                        The Common University Entrance Test (CUET) is a crucial
-                        step for students looking to secure admission in top
-                        universities. This guide covers effective strategies,
-                        time management techniques, and subject-specific tips.
+                        A simplified, student-friendly guide to cracking CUET with expert tips, subject-wise strategies, and common mistake fixes.
                       </p>
                       <div className="flex flex-wrap gap-1.5 mb-4">
                         <span className="bg-gray-100 rounded-full px-2.5 py-0.5 text-xs font-medium">
@@ -308,11 +304,11 @@ export default function DashboardPage() {
                           Study Tips
                         </span>
                         <span className="bg-gray-100 rounded-full px-2.5 py-0.5 text-xs font-medium">
-                          Education
+                          Prep
                         </span>
                       </div>
                       <Link
-                        href="/dashboard/blogs/comprehensive-guide-cuet-preparation-strategies"
+                        href="/dashboard/blogs/cuet-made-simple-with-team-pathbreakers"
                         className="inline-flex items-center"
                       >
                         <Button

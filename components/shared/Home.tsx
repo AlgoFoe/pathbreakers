@@ -318,7 +318,7 @@ const Home = () => {
                 <div className="flex items-center gap-4 mb-4">
                   <span className="inline-flex items-center rounded-full bg-gray-200 px-3 py-1 text-sm">
                     <Calendar className="h-3 w-3 mr-1" />
-                    May 26, 2025
+                    June 6, 2025
                   </span>
                   <span className="inline-flex items-center rounded-full bg-gray-200 px-3 py-1 text-sm">
                     <User className="h-3 w-3 mr-1" />
@@ -330,15 +330,11 @@ const Home = () => {
                 </div>
 
                 <h2 className="text-2xl font-bold mb-3">
-                  How to Prepare for CUET: A Comprehensive Guide for Students
+                  CUET Made Simple — With Team Pathbreakers
                 </h2>
 
                 <p className="text-gray-700 mb-4">
-                  The Common University Entrance Test (CUET) is a crucial step
-                  for students looking to secure admission in top universities.
-                  This guide covers effective strategies, time management
-                  techniques, and subject-specific tips to help you excel in
-                  your preparation.
+                   A simplified, student-friendly guide to cracking CUET with expert tips, subject-wise strategies, and common mistake fixes.
                 </p>
 
                 <div className="flex flex-wrap gap-2 mb-6">
@@ -349,14 +345,14 @@ const Home = () => {
                     Study Tips
                   </span>
                   <span className="bg-gray-100 rounded-full px-3 py-1 text-sm font-medium">
-                    Education
+                    Prep
                   </span>
                 </div>
 
                 <Link
                   href={
                     isSignedIn
-                      ? "/dashboard/blogs/comprehensive-guide-cuet-preparation-strategies"
+                      ? "/dashboard/blogs/cuet-made-simple-with-team-pathbreakers"
                       : "/sign-in"
                   }
                   className="inline-flex items-center"
