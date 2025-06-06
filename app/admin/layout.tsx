@@ -87,8 +87,6 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     { href: "/admin/quizzes", icon: <BookCheck size={20} />, label: "Quizzes" },
     { href: "/admin/flashcards", icon: <Zap size={20} />, label: "Flashcards" },
     { href: "/admin/question-banks", icon: <FileText size={20} />, label: "Question Banks" },
-    { href: "/admin/users", icon: <Users size={20} />, label: "Users" },
-    { href: "/admin/analytics", icon: <BarChart2 size={20} />, label: "Analytics" },
   ];
 
   return (
