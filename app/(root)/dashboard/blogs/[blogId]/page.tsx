@@ -51,6 +51,7 @@ const BlogPage = ({ params }: BlogPageProps) => {
         }
         
         setBlog(result.data);
+        console.log('Fetched blog:', result.data);
       } catch (error) {
         console.error('Error fetching blog:', error);
         setError(error instanceof Error ? error.message : 'Failed to fetch blog');
@@ -132,13 +133,10 @@ const BlogPage = ({ params }: BlogPageProps) => {
               <time>{formattedDate}</time>
             </div>
           </div>
-        </div>
-
-        {/* Blog Content */}
-        <div className="prose prose-sm sm:prose-base max-w-none">
+        </div>        {/* Blog Content */}
+        <div className="prose prose-lg max-w-none prose-headings:text-gray-900 prose-p:text-gray-700 prose-li:text-gray-700 prose-strong:font-semibold prose-strong:text-gray-900">
           <div 
             dangerouslySetInnerHTML={{ __html: blog.content }} 
-            className="prose max-w-none"
           />
         </div>
       </div>
