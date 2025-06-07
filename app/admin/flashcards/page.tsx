@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
@@ -9,27 +9,142 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { useToast } from "@/components/ui/use-toast";
 import {
   Search, PlusCircle, Edit, Trash2, MoreVertical, 
-  Eye, AlertCircle, BookOpen, Copy
+  Eye, AlertCircle, BookOpen, Copy, Loader2
 } from "lucide-react";
 
-// Mock data
-const mockFlashcards = [
-  { id: 1, title: "Biology Terms", cardsCount: 45, createdAt: "2025-05-28", status: "published" },
-  { id: 2, title: "Chemistry Formulas", cardsCount: 32, createdAt: "2025-05-25", status: "published" },
-  { id: 3, title: "Physics Concepts", cardsCount: 28, createdAt: "2025-05-20", status: "draft" },
-  { id: 4, title: "History Important Dates", cardsCount: 50, createdAt: "2025-05-15", status: "published" },
-  { id: 5, title: "Mathematics Equations", cardsCount: 36, createdAt: "2025-05-10", status: "draft" },
-];
+interface FlashcardSet {
+  _id: string;
+  title: string;
+  description?: string;
+  flashcards: Array<{
+    question: string;
+    answer: string;
+    difficulty: string;
+  }>;
+  category: string;
+  published: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
 
 export default function FlashcardsAdmin() {
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
+  const [flashcardSets, setFlashcardSets] = useState<FlashcardSet[]>([]);
+  const [loading, setLoading] = useState(true);
+  const { toast } = useToast();
   
-  const filteredFlashcards = mockFlashcards.filter(set => {
+  const fetchFlashcardSets = useCallback(async () => {
+    setLoading(true);
+    try {
+      const params = new URLSearchParams();
+      if (statusFilter !== "all") {
+        params.append("status", statusFilter);
+      }
+      if (searchQuery) {
+        params.append("query", searchQuery);
+      }
+
+      const response = await fetch(`/api/admin/flashcard-sets?${params.toString()}`);
+      
+      if (!response.ok) {
+        throw new Error('Failed to fetch flashcard sets');
+      }
+
+      const result = await response.json();
+      if (result.success) {
+        setFlashcardSets(result.data);
+      } else {
+        throw new Error(result.message || 'Failed to fetch flashcard sets');
+      }
+    } catch (error) {
+      console.error('Error fetching flashcard sets:', error);
+      toast({
+        title: "Error",
+        description: "Failed to load flashcard sets. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  }, [statusFilter, searchQuery, toast]);
+
+  // Fetch flashcard sets
+  useEffect(() => {
+    fetchFlashcardSets();
+  }, [fetchFlashcardSets]);
+  const handleDelete = async (id: string) => {
+    if (!window.confirm("Are you sure you want to delete this flashcard set?")) {
+      return;
+    }
+
+    try {
+      const response = await fetch(`/api/admin/flashcard-sets/${id}`, {
+        method: 'DELETE',
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to delete flashcard set');
+      }
+
+      toast({
+        title: "Success",
+        description: "Flashcard set deleted successfully.",
+      });
+
+      // Refresh the list
+      fetchFlashcardSets();
+    } catch (error) {
+      console.error('Error deleting flashcard set:', error);
+      toast({
+        title: "Error",
+        description: "Failed to delete flashcard set. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleTogglePublish = async (id: string, currentStatus: boolean) => {
+    try {
+      const response = await fetch(`/api/admin/flashcard-sets/${id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          published: !currentStatus
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to update flashcard set');
+      }
+
+      toast({
+        title: "Success",
+        description: `Flashcard set ${!currentStatus ? 'published' : 'unpublished'} successfully.`,
+      });
+
+      // Refresh the list
+      fetchFlashcardSets();
+    } catch (error) {
+      console.error('Error updating flashcard set:', error);
+      toast({
+        title: "Error",
+        description: "Failed to update flashcard set. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+  
+  const filteredFlashcards = flashcardSets.filter(set => {
     const matchesSearch = set.title.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesStatus = statusFilter === "all" || set.status === statusFilter;
+    const matchesStatus = statusFilter === "all" || 
+      (statusFilter === "published" && set.published) ||
+      (statusFilter === "draft" && !set.published);
     return matchesSearch && matchesStatus;
   });
 
@@ -83,16 +198,24 @@ export default function FlashcardsAdmin() {
                     <TableHead>Created Date</TableHead>
                     <TableHead>Actions</TableHead>
                   </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {filteredFlashcards.length > 0 ? (
+                </TableHeader>                <TableBody>
+                  {loading ? (
+                    <TableRow>
+                      <TableCell colSpan={5} className="text-center py-8">
+                        <div className="flex justify-center items-center gap-2">
+                          <Loader2 className="h-6 w-6 animate-spin" />
+                          <span>Loading flashcard sets...</span>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ) : filteredFlashcards.length > 0 ? (
                     filteredFlashcards.map((set) => (
-                      <TableRow key={set.id}>
+                      <TableRow key={set._id}>
                         <TableCell className="font-medium">{set.title}</TableCell>
-                        <TableCell>{set.cardsCount}</TableCell>
+                        <TableCell>{set.flashcards.length}</TableCell>
                         <TableCell>
                           <div className="flex items-center gap-2">
-                            {set.status === "published" ? (
+                            {set.published ? (
                               <>
                                 <div className="h-2 w-2 rounded-full bg-green-500" />
                                 <span>Published</span>
@@ -105,39 +228,37 @@ export default function FlashcardsAdmin() {
                             )}
                           </div>
                         </TableCell>
-                        <TableCell>{new Date(set.createdAt).toLocaleDateString()}</TableCell>
-                        <TableCell>
+                        <TableCell>{new Date(set.createdAt).toLocaleDateString()}</TableCell>                        <TableCell>
                           <div className="flex items-center gap-2">
                             <Button variant="ghost" size="icon" asChild>
-                              <Link href={`/admin/flashcards/edit/${set.id}`}>
+                              <Link href={`/admin/flashcards/${set._id}`}>
                                 <Edit className="h-4 w-4" />
                                 <span className="sr-only">Edit</span>
                               </Link>
                             </Button>
                             <Button variant="ghost" size="icon" asChild>
-                              <Link href={`/flashcards/${set.id}`} target="_blank">
+                              <Link href={`/dashboard/flashcards/sets/${set._id}`} target="_blank">
                                 <Eye className="h-4 w-4" />
                                 <span className="sr-only">View</span>
                               </Link>
                             </Button>
-                            <DropdownMenu>
-                              <DropdownMenuTrigger asChild>
-                                <Button variant="ghost" size="icon">
-                                  <MoreVertical className="h-4 w-4" />
-                                  <span className="sr-only">More</span>
-                                </Button>
-                              </DropdownMenuTrigger>
-                              <DropdownMenuContent align="end">
-                                <DropdownMenuItem>
-                                  <Copy className="h-4 w-4 mr-2" />
-                                  Duplicate
-                                </DropdownMenuItem>
-                                <DropdownMenuItem className="text-destructive">
-                                  <Trash2 className="h-4 w-4 mr-2" />
-                                  Delete
-                                </DropdownMenuItem>
-                              </DropdownMenuContent>
-                            </DropdownMenu>
+                            <Button 
+                              variant="ghost" 
+                              size="sm"
+                              onClick={() => handleTogglePublish(set._id, set.published)}
+                              className={set.published ? "text-orange-600 hover:text-orange-700" : "text-green-600 hover:text-green-700"}
+                            >
+                              {set.published ? "Unpublish" : "Publish"}
+                            </Button>
+                            <Button 
+                              variant="ghost" 
+                              size="icon"
+                              onClick={() => handleDelete(set._id)}
+                              className="text-red-600 hover:text-red-700"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                              <span className="sr-only">Delete</span>
+                            </Button>
                           </div>
                         </TableCell>
                       </TableRow>

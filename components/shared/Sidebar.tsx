@@ -64,7 +64,8 @@ const Sidebar = () => {
                   link.route === pathname ||
                   (link.label === "Quiz" && pathname.startsWith("/dashboard/quiz")) ||
                   (link.label === "Blogs" && pathname.startsWith("/dashboard/blogs")) ||
-                  (link.label === "Question Banks" && pathname.startsWith("/dashboard/question-banks"));
+                  (link.label === "Question Banks" && pathname.startsWith("/dashboard/question-banks"))
+                  || (link.label === "Flash Cards" && pathname.startsWith("/dashboard/flashcards")) ;
 
                 if (
                   (pathname === "/cuet-syllabus" || pathname === "/mentors") &&

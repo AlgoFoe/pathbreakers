@@ -9,10 +9,11 @@ import CategoryCard from '@/components/flashcards/CategoryCard';
 import FlashcardCarouselModal from '@/components/flashcards/FlashcardCarouselModal';
 import { Card } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Loader2 } from 'lucide-react';
+import { Loader2, BookOpen, Clock, Users } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import useDebounce from '@/hooks/useDebounce';
-import { metadata } from './metadata';
-
+import { useRouter } from 'next/navigation';
 interface FlashcardType {
   _id: string;
   question: string;
@@ -20,6 +21,16 @@ interface FlashcardType {
   category: string;
   difficulty: string;
   createdAt?: Date;
+}
+
+interface FlashcardSetType {
+  _id: string;
+  title: string;
+  description: string;
+  category: string;
+  flashcardCount: number;
+  createdAt?: Date;
+  updatedAt?: Date;
 }
 
 interface FlashcardFormData {
@@ -31,17 +42,21 @@ interface FlashcardFormData {
 
 const FlashcardsPage = () => {
   const { toast } = useToast();
-  
-  // State
+  const router = useRouter();
+    // State
   const [flashcards, setFlashcards] = useState<FlashcardType[]>([]);
+  const [flashcardSets, setFlashcardSets] = useState<FlashcardSetType[]>([]);
   const [allCategories, setAllCategories] = useState<string[]>([]);
   const [filteredCards, setFilteredCards] = useState<FlashcardType[]>([]);
+  const [filteredSets, setFilteredSets] = useState<FlashcardSetType[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [selectedDifficulty, setSelectedDifficulty] = useState('all');
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingCard, setEditingCard] = useState<FlashcardType | null>(null);
   const [loading, setLoading] = useState(true);
+  const [setsLoading, setSetsLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState<'cards' | 'sets'>('sets');
   
   // For category-based display and modal
   const [isCarouselModalOpen, setIsCarouselModalOpen] = useState(false);
@@ -51,6 +66,53 @@ const FlashcardsPage = () => {
   const difficulties = ["easy", "medium", "hard"];
 
   const debouncedSearchQuery = useDebounce(searchQuery, 300);
+
+  // Fetch flashcard sets
+  useEffect(() => {
+    const fetchFlashcardSets = async () => {
+      setSetsLoading(true);
+      try {
+        const params = new URLSearchParams();
+        if (selectedCategory !== 'all') {
+          params.append('category', selectedCategory);
+        }
+        if (debouncedSearchQuery) {
+          params.append('query', debouncedSearchQuery);
+        }
+
+        const url = `/api/flashcard-sets${params.toString() ? `?${params.toString()}` : ''}`;
+        const response = await fetch(url);
+
+        if (!response.ok) {
+          throw new Error(`Failed to fetch flashcard sets: ${response.status}`);
+        }
+
+        const result = await response.json();
+        
+        if (result.success) {
+          setFlashcardSets(result.data);
+          
+          // Extract categories from flashcard sets too
+          const setCategories = result.data.map((set: FlashcardSetType) => set.category);
+          setAllCategories(prev => {
+            const combined = [...prev, ...setCategories];
+            return Array.from(new Set(combined));
+          });
+        }
+      } catch (error) {
+        console.error("Error fetching flashcard sets:", error);
+        toast({
+          title: "Error",
+          description: "Failed to load flashcard sets. Please try again later.",
+          variant: "destructive",
+        });
+      } finally {
+        setSetsLoading(false);
+      }
+    };
+
+    fetchFlashcardSets();
+  }, [debouncedSearchQuery, selectedCategory, toast]);
 
   // Fetch flashcards whenever filters change
   useEffect(() => {
@@ -110,7 +172,6 @@ const FlashcardsPage = () => {
 
     fetchFlashcards();
   }, [debouncedSearchQuery, selectedCategory, selectedDifficulty, toast]);
-
   // Apply local filtering to flashcards
   useEffect(() => {
     let filtered = [...flashcards];
@@ -137,6 +198,28 @@ const FlashcardsPage = () => {
     
     setFilteredCards(filtered);
   }, [flashcards, selectedCategory, selectedDifficulty, searchQuery]);
+
+  // Apply local filtering to flashcard sets
+  useEffect(() => {
+    let filtered = [...flashcardSets];
+    
+    // Apply category filter
+    if (selectedCategory !== 'all') {
+      filtered = filtered.filter(set => set.category === selectedCategory);
+    }
+    
+    // Apply search query filter
+    if (searchQuery) {
+      const query = searchQuery.toLowerCase();
+      filtered = filtered.filter(
+        set => 
+          set.title.toLowerCase().includes(query) || 
+          set.description.toLowerCase().includes(query)
+      );
+    }
+    
+    setFilteredSets(filtered);
+  }, [flashcardSets, selectedCategory, searchQuery]);
 
   // Group flashcards by category for the category cards view
   const flashcardsByCategory = useMemo(() => {
@@ -302,10 +385,9 @@ const FlashcardsPage = () => {
     setSelectedCategoryForModal(category);
     setIsCarouselModalOpen(true);
   };
-
   return (
     <div className="container mx-auto py-6 space-y-6 max-w-7xl">
-        <FilterBar 
+      <FilterBar 
         searchQuery={searchQuery}
         setSearchQuery={setSearchQuery}
         selectedCategory={selectedCategory}
@@ -316,36 +398,105 @@ const FlashcardsPage = () => {
         categories={allCategories}
         difficulties={difficulties}
         onRefresh={() => {
-          // Trigger a refresh by forcing the useEffect to run again
           setSelectedCategory('all');
           setSelectedDifficulty('all');
           setSearchQuery('');
         }}
       />
 
-      {loading ? (
-        <div className="flex justify-center items-center py-12">
-          <Loader2 className="h-8 w-8 animate-spin text-primary" />
-          <span className="ml-2">Loading flashcards...</span>
-        </div>
-      ) : filteredCards.length === 0 ? (
-        <Alert>
-          <AlertDescription>
-            No flashcards found. Try adjusting your filters or create a new flashcard.
-          </AlertDescription>
-        </Alert>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {Object.entries(flashcardsByCategory).map(([category, cards]) => (
-            <CategoryCard 
-              key={category}
-              category={category}
-              count={cards.length}
-              onClick={() => handleCategoryClick(category)}
-            />
-          ))}
-        </div>
-      )}
+      <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as 'cards' | 'sets')} className="w-full">
+        <TabsList className="grid w-full max-w-md grid-cols-2">
+          <TabsTrigger value="sets" className="flex items-center gap-2">
+            <BookOpen className="h-4 w-4" />
+            Flashcard Sets
+          </TabsTrigger>
+          <TabsTrigger value="cards" className="flex items-center gap-2">
+            <Users className="h-4 w-4" />
+            Individual Cards
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="sets" className="space-y-4">
+          {setsLoading ? (
+            <div className="flex justify-center items-center py-12">
+              <Loader2 className="h-8 w-8 animate-spin text-primary" />
+              <span className="ml-2">Loading flashcard sets...</span>
+            </div>
+          ) : filteredSets.length === 0 ? (
+            <Alert>
+              <AlertDescription>
+                No flashcard sets found. Check back later for new sets or try adjusting your filters.
+              </AlertDescription>
+            </Alert>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {filteredSets.map((set) => (
+                <Card key={set._id} className="p-6 hover:shadow-lg transition-shadow cursor-pointer">
+                  <div className="space-y-3">
+                    <div className="flex justify-between items-start">
+                      <h3 className="font-semibold text-lg line-clamp-2">{set.title}</h3>
+                      <span className="text-xs bg-primary/10 text-primary px-2 py-1 rounded-full">
+                        {set.category}
+                      </span>
+                    </div>
+                    
+                    <p className="text-sm text-muted-foreground line-clamp-3">
+                      {set.description}
+                    </p>
+                    
+                    <div className="flex items-center justify-between text-sm text-muted-foreground">
+                      <div className="flex items-center gap-1">
+                        <BookOpen className="h-4 w-4" />
+                        <span>{set.flashcardCount} cards</span>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <Clock className="h-4 w-4" />
+                        <span>{new Date(set.updatedAt || set.createdAt || '').toLocaleDateString()}</span>
+                      </div>
+                    </div>
+                    
+                    <Button 
+                      className="w-full mt-4"
+                      onClick={() => {
+                        // TODO: Navigate to individual flashcard set study page
+                        router.push(`/dashboard/flashcards/sets/${set._id}`);
+                      }}
+                    >
+                      Study Set
+                    </Button>
+                  </div>
+                </Card>
+              ))}
+            </div>
+          )}
+        </TabsContent>
+
+        <TabsContent value="cards" className="space-y-4">
+          {loading ? (
+            <div className="flex justify-center items-center py-12">
+              <Loader2 className="h-8 w-8 animate-spin text-primary" />
+              <span className="ml-2">Loading flashcards...</span>
+            </div>
+          ) : filteredCards.length === 0 ? (
+            <Alert>
+              <AlertDescription>
+                No flashcards found. Try adjusting your filters or create a new flashcard.
+              </AlertDescription>
+            </Alert>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {Object.entries(flashcardsByCategory).map(([category, cards]) => (
+                <CategoryCard 
+                  key={category}
+                  category={category}
+                  count={cards.length}
+                  onClick={() => handleCategoryClick(category)}
+                />
+              ))}
+            </div>
+          )}
+        </TabsContent>
+      </Tabs>
 
       <FlashcardDialog 
         isOpen={isDialogOpen}

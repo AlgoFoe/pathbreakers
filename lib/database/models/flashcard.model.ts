@@ -5,7 +5,10 @@ export interface IFlashcard extends Document {
   answer: string;
   category: string;
   difficulty: string;
-  createdBy: Schema.Types.ObjectId;
+  setTitle?: string;
+  setDescription?: string;
+  published: boolean;
+  createdBy: string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -29,9 +32,19 @@ const FlashcardSchema = new Schema<IFlashcard>(
       enum: ["easy", "medium", "hard"],
       default: "medium",
     },
+    setTitle: {
+      type: String,
+    },
+    setDescription: {
+      type: String,
+    },
+    published: {
+      type: Boolean,
+      default: false,
+    },
     createdBy: {
-      type: Schema.Types.ObjectId,
-      ref: "User",
+      type: String,
+      required: true,
     },
   },
   { timestamps: true }

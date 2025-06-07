@@ -16,7 +16,7 @@ import {
     Save, Trash2
 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { v4 as uuidv4 } from 'uuid';
 
 // Define types for flashcards
@@ -31,42 +31,78 @@ export default function FlashcardEditor({ params }: { params?: { id: string } })
   const router = useRouter();
   const isEditing = !!params?.id;
   
+  // Loading state
+  const [isLoading, setIsLoading] = useState(isEditing);
+  
   // Form state
-  const [title, setTitle] = useState(isEditing ? "Biology Terms" : "");
-  const [description, setDescription] = useState(isEditing 
-    ? "Important biology terminology and definitions for exams" 
-    : ""
-  );
-  const [isPublic, setIsPublic] = useState(true);
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   
   // Flashcards state
-  const [flashcards, setFlashcards] = useState<Flashcard[]>(
-    isEditing 
-      ? [
-          {
-            id: "1",
-            front: "Photosynthesis",
-            back: "The process by which green plants and some other organisms use sunlight to synthesize nutrients from carbon dioxide and water."
-          },
-          {
-            id: "2",
-            front: "Mitochondria",
-            back: "Organelles that generate energy for the cell in the form of ATP through respiration."
-          },
-          {
-            id: "3",
-            front: "Osmosis",
-            back: "The process by which molecules of a solvent pass through a semipermeable membrane from a less concentrated solution into a more concentrated one."
-          },
-          {
-            id: "4",
-            front: "DNA",
-            back: "Deoxyribonucleic acid, a self-replicating material present in nearly all living organisms as the main constituent of chromosomes."
+  const [flashcards, setFlashcards] = useState<Flashcard[]>([]);
+  
+  // Load existing flashcard set if editing
+  useEffect(() => {
+    if (isEditing && params?.id) {
+      const loadFlashcardSet = async () => {        try {
+          const response = await fetch(`/api/admin/flashcard-sets/${params.id}`);
+          if (!response.ok) {
+            throw new Error('Failed to load flashcard set');
           }
-        ]
-      : []
-  );
+          
+          const result = await response.json();
+          
+          if (!result.success) {
+            throw new Error(result.message || 'Failed to load flashcard set');
+          }
+          
+          const data = result.data;
+          
+          setTitle(data.title || '');
+          setDescription(data.description || '');
+          
+          // Handle flashcards array with proper null/undefined checks
+          if (data.flashcards && Array.isArray(data.flashcards)) {
+            setFlashcards(data.flashcards.map((card: any) => ({
+              id: uuidv4(),
+              front: card.question || '',
+              back: card.answer || ''
+            })));
+          } else {
+            // If no flashcards, start with one empty card
+            setFlashcards([{
+              id: uuidv4(),
+              front: '',
+              back: ''
+            }]);
+          }
+        } catch (error) {
+          console.error('Error loading flashcard set:', error);
+          toast({
+            title: "Error",
+            description: "Failed to load flashcard set. Please try again.",
+            variant: "destructive",
+          });
+          router.push("/admin/flashcards");
+        } finally {
+          setIsLoading(false);
+        }
+      };
+      
+      loadFlashcardSet();
+    }
+  }, [isEditing, params?.id, router]);
+  
+  // Initialize with empty flashcard for new sets
+  useEffect(() => {
+    if (!isEditing && flashcards.length === 0) {
+      setFlashcards([{
+        id: uuidv4(),
+        front: '',
+        back: ''
+      }]);
+    }  }, [isEditing, flashcards.length]);
 
   // Handle drag and drop reordering
   const onDragEnd = (result: any) => {
@@ -108,7 +144,6 @@ export default function FlashcardEditor({ params }: { params?: { id: string } })
       card.id === id ? { ...card, front: card.back, back: card.front } : card
     ));
   };
-
   // Save flashcard set
   const handleSave = async (isDraft: boolean = false) => {
     setIsSubmitting(true);
@@ -136,11 +171,35 @@ export default function FlashcardEditor({ params }: { params?: { id: string } })
         }
       }
       
-      // In a real app, you'd make an API request here
-      // Example: await fetch('/api/flashcards', { method: 'POST', body: JSON.stringify({...}) })
-      
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      const requestData = {
+        title: title.trim(),
+        description: description.trim(),
+        flashcards: flashcards.map(card => ({
+          question: card.front.trim(),
+          answer: card.back.trim(),
+          difficulty: "medium" // Default difficulty
+        })),
+        category: "General", // Default category for now
+        published: !isDraft
+      };
+
+      const url = isEditing ? `/api/admin/flashcard-sets/${params?.id}` : '/api/admin/flashcard-sets';
+      const method = isEditing ? 'PUT' : 'POST';
+
+      const response = await fetch(url, {
+        method,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(requestData),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to save flashcard set');
+      }
+
+      const result = await response.json();
       
       toast({
         title: isDraft ? "Flashcard set saved as draft" : "Flashcard set published",
@@ -152,27 +211,35 @@ export default function FlashcardEditor({ params }: { params?: { id: string } })
       console.error("Error saving flashcard set:", error);
       toast({
         title: "Error",
-        description: "Failed to save flashcard set. Please try again.",
+        description: error instanceof Error ? error.message : "Failed to save flashcard set. Please try again.",
         variant: "destructive",
       });
     } finally {
       setIsSubmitting(false);
     }
   };
-
   return (
     <div className="container mx-auto p-6 max-w-7xl">
-      <motion.div 
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        className="mb-6 flex items-center"
-      >
-        <Button variant="ghost" onClick={() => router.push("/admin/flashcards")} className="mr-4">
-          <ChevronLeft className="mr-2 h-4 w-4" />
-          Back to Flashcards
-        </Button>
-        <h1 className="text-3xl font-bold">{isEditing ? "Edit Flashcard Set" : "Create New Flashcard Set"}</h1>
-      </motion.div>
+      {isLoading ? (
+        <div className="flex items-center justify-center h-64">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+            <p className="text-muted-foreground">Loading flashcard set...</p>
+          </div>
+        </div>
+      ) : (
+        <>
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="mb-6 flex items-center"
+          >
+            <Button variant="ghost" onClick={() => router.push("/admin/flashcards")} className="mr-4">
+              <ChevronLeft className="mr-2 h-4 w-4" />
+              Back to Flashcards
+            </Button>
+            <h1 className="text-3xl font-bold">{isEditing ? "Edit Flashcard Set" : "Create New Flashcard Set"}</h1>
+          </motion.div>
       
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2">
@@ -201,22 +268,7 @@ export default function FlashcardEditor({ params }: { params?: { id: string } })
                   onChange={(e) => setDescription(e.target.value)}
                   className="mt-1 resize-none"
                   rows={3}
-                />
-              </div>
-              
-              <div className="flex items-center justify-between pt-4 border-t">
-                <div>
-                  <Label htmlFor="isPublic" className="text-base">Public Set</Label>
-                  <p className="text-sm text-muted-foreground">
-                    Make this flashcard set available to all users
-                  </p>
-                </div>
-                <Switch 
-                  id="isPublic" 
-                  checked={isPublic}
-                  onCheckedChange={setIsPublic}
-                />
-              </div>
+                />              </div>
             </CardContent>
           </Card>
           
@@ -351,53 +403,7 @@ export default function FlashcardEditor({ params }: { params?: { id: string } })
             </Button>
           </div>
         </div>
-        
-        <div className="space-y-6">
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle>Publishing Options</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="flex items-center justify-between border-b pb-4">
-                <div>
-                  <h3 className="font-medium">Cards</h3>
-                  <p className="text-sm text-muted-foreground">
-                    {flashcards.length} cards in this set
-                  </p>
-                </div>
-                <Button variant="outline" size="sm" onClick={addFlashcard}>
-                  <PlusCircle className="h-3 w-3 mr-1" />
-                  Add
-                </Button>
-              </div>
-              
-              <div>
-                <h3 className="font-medium mb-2">Import Cards</h3>
-                <p className="text-sm text-muted-foreground mb-3">
-                  Import flashcards from a CSV file
-                </p>
-                <Input
-                  type="file"
-                  accept=".csv"
-                  className="max-w-full"
-                />
-                <p className="text-xs text-muted-foreground mt-2">
-                  Format: &quot;front text&quot;,&quot;back text&quot; - one card per line
-                </p>
-              </div>
-              
-              <div className="flex items-center justify-between pt-4 border-t">
-                <div>
-                  <h3 className="font-medium">Allow Download</h3>
-                  <p className="text-sm text-muted-foreground">
-                    Let users download this set as PDF
-                  </p>
-                </div>
-                <Switch defaultChecked />
-              </div>
-            </CardContent>
-          </Card>
-          
+          <div className="space-y-6">
           <div className="flex flex-col gap-3">
             <Button 
               onClick={() => handleSave(false)}
@@ -405,7 +411,7 @@ export default function FlashcardEditor({ params }: { params?: { id: string } })
               className="w-full"
             >
               <Save className="mr-2 h-4 w-4" />
-              {isSubmitting ? "Publishing..." : "Publish Set"}
+              {isSubmitting ? "Publishing..." : "Publish Flashcard Set"}
             </Button>
             
             <Button 
@@ -414,11 +420,12 @@ export default function FlashcardEditor({ params }: { params?: { id: string } })
               disabled={isSubmitting}
               className="w-full"
             >
-              {isSubmitting ? "Saving..." : "Save as Draft"}
-            </Button>
+              {isSubmitting ? "Saving..." : "Save as Draft"}            </Button>
           </div>
         </div>
       </div>
+        </>
+      )}
     </div>
   );
 }
