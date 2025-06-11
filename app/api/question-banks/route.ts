@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { connectToDatabase } from '@/lib/database/mongoose';
 import QuestionBank from '@/lib/database/models/questionBank.model';
 
+export const revalidate = 0;
+
 export async function GET(req: NextRequest) {
   try {
     await connectToDatabase();
