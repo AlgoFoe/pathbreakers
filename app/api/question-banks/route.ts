@@ -11,6 +11,7 @@ export async function GET(req: NextRequest) {
     const questionBanks = await QuestionBank.find({ status: 'published' })
       .select('-questions')
       .sort({ createdAt: -1 });
+    console.log("Question bank:", questionBanks);
     
     return NextResponse.json(questionBanks);
   } catch (error) {
