@@ -3,8 +3,8 @@
 import { cookies } from "next/headers";
 
 
-const ADMIN_EMAIL = process.env.ADMIN_EMAIL || "admin@pathbreakers.com";
-const ADMIN_PASSWORD = process.env.ADMIN_EMAIL || "admin123"; 
+const ADMIN_EMAIL = "admin@pathbreakers.com";
+const ADMIN_PASSWORD = "admin123"; 
 
 export async function authenticateAdmin(email: string, password: string) {
   if (email === ADMIN_EMAIL && password === ADMIN_PASSWORD) {
