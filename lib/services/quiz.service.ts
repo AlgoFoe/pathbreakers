@@ -25,7 +25,14 @@ export interface QuizData {
   description?: string;
 }
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || '';
+let API_URL;
+if (process.env.NEXT_PUBLIC_APP_URL) {
+API_URL = process.env.NEXT_PUBLIC_APP_URL;
+} else if (process.env.VERCEL_URL) {
+API_URL =`https://${process.env.VERCEL_URL}`;
+} else {
+API_URL = 'http://localhost:3000';
+}
 
 export const QuizService = {
   // Get all quizzes
