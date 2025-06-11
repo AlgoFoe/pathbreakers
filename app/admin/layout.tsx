@@ -1,19 +1,24 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { usePathname } from "next/navigation";
-import Link from "next/link";
-import Image from "next/image";
-import { motion, AnimatePresence } from "framer-motion";
-import { checkAdminAuth } from "./auth";
-import { redirect } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { 
-  LayoutDashboard, FileText, BookCheck, Zap, Users, 
-  BarChart2, Settings, LogOut, ChevronRight, ChevronLeft, Menu
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { motion } from "framer-motion";
+import {
+  BookCheck,
+  ChevronLeft,
+  ChevronRight,
+  FileText,
+  LayoutDashboard,
+  LogOut,
+  Menu,
+  Zap
 } from "lucide-react";
+import Image from "next/image";
+import Link from "next/link";
+import { redirect, usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
+import { checkAdminAuth } from "./auth";
 
 interface NavItemProps {
   href: string;
@@ -88,17 +93,16 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     { href: "/admin/flashcards", icon: <Zap size={20} />, label: "Flashcards" },
     { href: "/admin/question-banks", icon: <FileText size={20} />, label: "Question Banks" },
   ];
-
   return (
-    <div className="flex h-screen overflow-hidden bg-background">
+    <div className="flex flex-col h-screen bg-background">
       {/* Desktop Sidebar */}
       <motion.aside
         initial={false}
         animate={{ width: collapsed ? 72 : 240 }}
         transition={{ duration: 0.3 }}
-        className="hidden md:flex flex-col border-r bg-card shadow-sm h-full"
+        className="hidden md:flex flex-col border-r bg-card shadow-sm h-full fixed top-0 left-0 z-30"
       >
-        <div className={`flex items-center ${collapsed ? 'justify-center' : 'justify-between'} p-4 border-b h-16`}>
+        <div className={flex items-center ${collapsed ? 'justify-center' : 'justify-between'} p-4 border-b h-16}>
           {!collapsed && (
             <Link href="/admin/dashboard" className="flex items-center gap-2">
               <Image src="/assets/images/logo-admin.png" alt="Logo" width={40} height={40} className="rounded-full" />
@@ -144,10 +148,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             {!collapsed && <span>Logout</span>}
           </button>
         </div>
-      </motion.aside>
-
-      {/* Mobile Navigation */}
-      <div className="md:hidden flex items-center border-b h-16 px-4 sticky top-0 bg-background z-30 w-full">
+      </motion.aside>      {/* Mobile Navigation */}
+      <div className="md:hidden flex items-center border-b h-16 px-4 sticky top-0 bg-background z-20 w-full">
         <Sheet>
           <SheetTrigger asChild>
             <Button variant="ghost" size="icon">
@@ -176,7 +178,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                     </Link>
                   ))}
                 </nav>
-              </ScrollArea>              <div className="p-4 border-t">
+              </ScrollArea>              
+              <div className="p-4 border-t">
                 <button 
                   onClick={() => {
                     // Use window.location to ensure complete redirect after logout
@@ -197,11 +200,11 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             <span className="font-semibold">Pathbreakers Admin</span>
           </Link>
         </div>
-      </div>
-
-      {/* Main Content Area */}
-      <main className="flex-1 overflow-auto">
-        {children}
+      </div>      {/* Main Content Area */}
+      <main className="flex-1 overflow-auto md:ml-[72px] md:w-[calc(100%-72px)] lg:ml-[240px] lg:w-[calc(100%-240px)] md:pt-0">
+        <div className="container mx-auto p-4 md:p-6">
+          {children}
+        </div>
       </main>
     </div>
   );
