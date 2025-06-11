@@ -102,7 +102,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         transition={{ duration: 0.3 }}
         className="hidden md:flex flex-col border-r bg-card shadow-sm h-full fixed top-0 left-0 z-30"
       >
-        <div className={flex items-center ${collapsed ? 'justify-center' : 'justify-between'} p-4 border-b h-16}>
+        <div className={`flex items-center ${collapsed ? 'justify-center' : 'justify-between'} p-4 border-b h-16`}>
           {!collapsed && (
             <Link href="/admin/dashboard" className="flex items-center gap-2">
               <Image src="/assets/images/logo-admin.png" alt="Logo" width={40} height={40} className="rounded-full" />
