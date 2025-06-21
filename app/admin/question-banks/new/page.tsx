@@ -249,13 +249,12 @@ export default function NewQuestionBank() {
                           <SelectValue placeholder="Select a category" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="math">Math</SelectItem>
-                          <SelectItem value="science">Science</SelectItem>
+                          <SelectItem value="business-studies">Business Studies</SelectItem>
                           <SelectItem value="english">English</SelectItem>
-                          <SelectItem value="history">History</SelectItem>
-                          <SelectItem value="geography">Geography</SelectItem>
-                          <SelectItem value="computer-science">Computer Science</SelectItem>
-                          <SelectItem value="general-knowledge">General Knowledge</SelectItem>
+                          <SelectItem value="psychology">Psychology</SelectItem>
+                          <SelectItem value="accountancy">Accountancy</SelectItem>
+                          <SelectItem value="applied-mathematics">Applied Mathematics</SelectItem>
+                          <SelectItem value="economics">Economics</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
@@ -343,7 +342,7 @@ export default function NewQuestionBank() {
                             </div>
                             <div className="col-span-2 flex justify-center">
                               <RadioGroup
-                                value={option.isCorrect ? option.id : undefined}
+                                value={question.options.find(opt => opt.isCorrect)?.id || ""}
                                 onValueChange={(value) => handleCorrectAnswerChange(question.id, value)}
                               >
                                 <div className="flex items-center">

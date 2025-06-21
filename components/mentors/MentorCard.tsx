@@ -44,6 +44,12 @@ export default function MentorCard({ mentor }: { mentor: MentorProps }) {
             alt={mentor.name}
             fill
             className="object-cover"
+            style={{
+              objectPosition:
+                mentor.name === "Krishnasingh Thakur"
+                  ? "center 10%"
+                  : "center center",
+            }}
           />
           <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-4">
             <h3 className="text-xl font-bold text-white">{mentor.name}</h3>

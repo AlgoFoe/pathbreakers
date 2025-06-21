@@ -18,12 +18,22 @@ const mentors: Mentor[] = [
     id: 1,
     name: "Krishnasingh Thakur",
     title: "IPMAT & CUET Expert",
-    image: "https://images.unsplash.com/photo-1568602471122-7832951cc4c5?q=80&w=300&h=300&auto=format&fit=crop",
+    image: "/assets/images/main.png",
     categories: ["IPMAT", "CUET"],
     description: "Mr. Krishnasingh Thakur is an experienced mentor and carrer coach for guiding students through IPMAT and CUET preparation. He has helped hundreds of students achieve their dreams.",
     bookingLink: "https://forms.gle/your-google-form-link",
     achievements: "(Founder PathBreakers) IIIT NAGPUR\nCareer coach\nMentored 1800+ students\nBuilt 2 businesses\nGrowth and Marketing Consultant"
   },
+  {
+    id: 2,
+    name: "Khushi Babbar",
+    title: "CUET Mentor & College Guide",
+    image: "/assets/images/khushi.png", 
+    categories: ["CUET"],
+    description: "Miss Khushi Babbar is a second-year student at Lady Shri Ram College for Women, currently pursuing a B.Sc. (Hons) in Mathematics. She has actively mentored multiple students through the CUET process, helping them navigate their doubts with clarity and confidence.",
+    bookingLink: "https://forms.gle/google-form-link-khushi", 
+    achievements: "Founding Team Member, PathBreakers\nLady Shri Ram College, B.Sc. (Hons) Mathematics\nCUET Mentor\nMentored several students through college applications and CUET\nStrong experience in peer guidance and growth strategy"
+  }
 ];
 
 // Get all mentors
