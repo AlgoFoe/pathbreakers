@@ -35,7 +35,7 @@ const Layout = ({ children }: LayoutProps) => {
     <div
       className={`flex flex-col min-h-screen bg-white border-l border-gray-300 shadow-lg`}
     >
-      <header className="hidden lg:sticky lg:top-0 lg:z-10 lg:w-full lg:bg-lblue lg:bg-opacity-20 lg:backdrop-filter lg:backdrop-blur-lg lg:shadow-lg lg:block">
+      <header className="hidden lg:sticky lg:top-0 lg:z-30 lg:w-full lg:bg-lblue lg:bg-opacity-20 lg:backdrop-filter lg:backdrop-blur-lg lg:shadow-lg lg:block">
         <div className="container mx-auto px-4 py-2">
           <div className="flex gap-2 items-center justify-between ">
         <div className="flex items-center gap-1">

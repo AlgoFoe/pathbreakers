@@ -28,7 +28,7 @@ const mentors: Mentor[] = [
     id: 2,
     name: "Khushi Babbar",
     title: "CUET Mentor & College Guide",
-    image: "/assets/images/khushi.png", 
+    image: "/assets/images/khushi.jpg", 
     categories: ["CUET"],
     description: "Miss Khushi Babbar is a second-year student at Lady Shri Ram College for Women, currently pursuing a B.Sc. (Hons) in Mathematics. She has actively mentored multiple students through the CUET process, helping them navigate their doubts with clarity and confidence.",
     bookingLink: "https://forms.gle/google-form-link-khushi", 

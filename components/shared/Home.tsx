@@ -75,8 +75,9 @@ const Home = () => {
                 className="text-lg font-medium text-black hover:underline"
               >
                 About Us
-              </Link>              <Link
-                href="#courses"
+              </Link>              
+              <Link
+                href="/courses"
                 className="text-lg font-medium text-black hover:underline"
               >
                 Courses
@@ -142,7 +143,7 @@ const Home = () => {
                 </DropdownMenuContent>
               </DropdownMenu>
               <Link
-                href="#contact"
+                href="/contact"
                 className="text-lg font-medium text-black hover:underline"
               >
                 Contact Us

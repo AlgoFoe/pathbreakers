@@ -73,7 +73,7 @@ const MobileNav = () => {
   const [isSheetOpen, setSheetOpen] = useState(false);
 
   return (
-    <header className="header flex items-center z-10">
+    <header className="header flex items-center z-30">
       <Link href="/" className="flex">
         <Image
           src="/assets/images/large-logored.png"
